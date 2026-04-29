@@ -404,6 +404,116 @@
     .wuxing-grid { grid-template-columns: repeat(5, 1fr); }
     .tip-grid { grid-template-columns: 1fr; }
   }
+
+  /* ─── 六爻问卦 ─── */
+  .liuyao-ask {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .liuyao-ask h3 { color: var(--gold); font-size: 1.1rem; margin-bottom: 6px; letter-spacing: .08em; }
+  .liuyao-ask p  { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 18px; }
+  .liuyao-question {
+    width: 100%; box-sizing: border-box;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); border-radius: 10px;
+    padding: 14px 16px; font-size: 1rem;
+    outline: none; resize: none; height: 80px;
+    transition: border-color .3s;
+  }
+  .liuyao-question:focus { border-color: var(--gold); }
+  .liuyao-cast-btn {
+    margin-top: 16px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: #1a1000; border: none; border-radius: 30px;
+    padding: 13px 38px; font-size: 1rem; font-weight: 700;
+    cursor: pointer; letter-spacing: .1em;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .liuyao-cast-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(199,150,64,.45); }
+  .liuyao-cast-btn:active { transform: scale(.97); }
+  .liuyao-examples {
+    margin-top: 14px;
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  }
+  .liuyao-example-tag {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text-dim); border-radius: 20px;
+    padding: 5px 14px; font-size: 0.78rem; cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .liuyao-example-tag:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* coin toss animation */
+  .coins-wrap { display: flex; gap: 18px; justify-content: center; margin: 28px 0; }
+  .coin {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--gold) 0%, #7a5310 100%);
+    border: 2px solid var(--gold-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: 900; color: #1a1000;
+    animation: coinSpin 1.4s ease-in-out forwards;
+    box-shadow: 0 4px 14px rgba(199,150,64,.4);
+  }
+  @keyframes coinSpin {
+    0%   { transform: rotateY(0deg) scale(1); }
+    30%  { transform: rotateY(360deg) scale(1.1); }
+    60%  { transform: rotateY(720deg) scale(1); }
+    85%  { transform: rotateY(900deg) scale(1.05); }
+    100% { transform: rotateY(1080deg) scale(1); }
+  }
+  .coin:nth-child(2) { animation-delay: .12s; }
+  .coin:nth-child(3) { animation-delay: .24s; }
+
+  /* hexagram display */
+  .hexagram-pair { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin: 22px 0; }
+  .hexagram-box {
+    flex: 1; min-width: 160px; max-width: 220px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 16px; text-align: center;
+  }
+  .hexagram-box.primary { border-color: var(--gold); }
+  .hexagram-label { font-size: 0.72rem; color: var(--text-dim); letter-spacing: .06em; margin-bottom: 8px; }
+  .hexagram-name  { font-size: 1.15rem; color: var(--gold); font-weight: 700; margin-bottom: 14px; }
+  .hex-lines { display: flex; flex-direction: column; gap: 7px; align-items: center; }
+  .hex-line { display: flex; align-items: center; gap: 6px; height: 18px; width: 120px; }
+  .hex-line-yang { height: 6px; border-radius: 3px; background: var(--text); width: 100%; }
+  .hex-line-yin  { display: flex; gap: 12px; width: 100%; }
+  .hex-line-yin span { height: 6px; border-radius: 3px; background: var(--text); flex: 1; }
+  .hex-moving-yang .hex-line-yang { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+  .hex-moving-yin  .hex-line-yin span { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+  .hex-line-marker { font-size: 0.8rem; color: var(--gold); font-weight: 900; min-width: 16px; }
+
+  .hexagram-fav { margin: 10px 0 4px; font-size: 1rem; color: var(--gold); }
+  .hexagram-keyword {
+    display: inline-block; margin-top: 4px;
+    border: 1px solid var(--gold); border-radius: 12px;
+    padding: 2px 12px; font-size: 0.78rem; color: var(--gold); letter-spacing: .08em;
+  }
+  .liuyao-section-title {
+    font-size: 0.88rem; color: var(--gold); letter-spacing: .06em;
+    border-left: 3px solid var(--gold); padding-left: 10px;
+    margin: 22px 0 10px;
+  }
+  .liuyao-yao-list { display: flex; flex-direction: column; gap: 10px; }
+  .liuyao-yao-item {
+    background: var(--bg3); border-radius: 10px; padding: 12px 16px;
+    border-left: 3px solid var(--border);
+    font-size: 0.85rem; color: var(--text); line-height: 1.7;
+  }
+  .liuyao-yao-item.moving { border-left-color: var(--gold); }
+  .liuyao-yao-item .yao-num { color: var(--gold); font-weight: 700; font-size: 0.78rem; margin-bottom: 4px; }
+  .liuyao-answer {
+    background: linear-gradient(135deg, rgba(199,150,64,.08), rgba(199,150,64,.03));
+    border: 1px solid rgba(199,150,64,.3); border-radius: 14px;
+    padding: 20px 18px; margin-top: 18px; line-height: 1.9;
+    font-size: 0.9rem;
+  }
+  .liuyao-answer strong { color: var(--gold); }
+  .liuyao-result { animation: fadeIn 0.7s ease; }
 </style>
 </head>
 <body>
@@ -492,6 +602,7 @@
       <button class="tab-btn" onclick="switchTab('love')">♡ 感情婚姻</button>
       <button class="tab-btn" onclick="switchTab('health')">✦ 健康运势</button>
       <button class="tab-btn" onclick="switchTab('yearly')">◉ 年运走势</button>
+      <button class="tab-btn" onclick="switchTab('liuyao')">☯ 六爻问卦</button>
     </div>
 
     <div id="tab-bazi" class="tab-panel active"></div>
@@ -502,6 +613,7 @@
     <div id="tab-love" class="tab-panel"></div>
     <div id="tab-health" class="tab-panel"></div>
     <div id="tab-yearly" class="tab-panel"></div>
+    <div id="tab-liuyao" class="tab-panel"></div>
 
     <div style="text-align:center; margin-top:40px;">
       <button class="submit-btn" style="max-width:300px; display:inline-block;" onclick="reset()">
@@ -1087,6 +1199,305 @@ function getDaYun(data, pillars) {
     results.push({ stem: STEMS[si], branch: BRANCHES[bi], startAge, endAge, startYear, isCurrent, si, bi });
   }
   return results;
+}
+
+// ============================================================
+//  六爻问卦数据与函数
+// ============================================================
+
+// 八卦信息（底→顶的阳/阴线，用于从6根爻推导上下卦）
+// 二进制编码：位0=第1爻，位1=第2爻，位2=第3爻（阳=1, 阴=0）
+const TRIGRAM_INFO = {
+  0: { name:'坤', symbol:'☷', elem:'土', lines:[0,0,0] },
+  1: { name:'震', symbol:'☳', elem:'木', lines:[1,0,0] },
+  2: { name:'坎', symbol:'☵', elem:'水', lines:[0,1,0] },
+  3: { name:'兑', symbol:'☱', elem:'金', lines:[1,1,0] },
+  4: { name:'艮', symbol:'☶', elem:'土', lines:[0,0,1] },
+  5: { name:'离', symbol:'☲', elem:'火', lines:[1,0,1] },
+  6: { name:'巽', symbol:'☴', elem:'木', lines:[0,1,1] },
+  7: { name:'乾', symbol:'☰', elem:'金', lines:[1,1,1] },
+};
+
+// 64卦查询表，索引 = (上卦二进制 << 3) | 下卦二进制 → 卦序号(1-64)
+const HEXAGRAM_TABLE = [
+  2,  24,  7, 19, 15, 36, 46, 11,  // 上坤(0)
+ 16,  51, 40, 54, 62, 55, 32, 34,  // 上震(1)
+  8,   3, 29, 60, 39, 63, 48,  5,  // 上坎(2)
+ 45,  17, 47, 58, 31, 49, 28, 43,  // 上兑(3)
+ 23,  27,  4, 41, 52, 22, 18, 26,  // 上艮(4)
+ 35,  21, 64, 38, 56, 30, 50, 14,  // 上离(5)
+ 20,  42, 59, 61, 53, 37, 57,  9,  // 上巽(6)
+ 12,  25,  6, 10, 33, 13, 44,  1,  // 上乾(7)
+];
+
+// 64卦完整数据（index = 卦序号 1-64，index 0 留空）
+const HEXAGRAMS = [null,
+/* 1*/  {name:'乾为天',  key:'刚健自强', fav:5, general:'纯阳至刚，万象更新，大吉大利，宜主动进取，一切皆可成就。', wealth:'财运旺盛至极，投资创业均大吉，宜把握时机，主动出击。', career:'仕途光明，领导力爆发，升职创业均顺，功成名就之时。', love:'感情炽热，主动追求必成，桃花旺盛，佳偶天成。', health:'精力充沛如日中天，加强体能训练，养护阳气。'},
+/* 2*/  {name:'坤为地',  key:'厚德载物', fav:4, general:'阴柔包容，以静制动，顺势而为，积累深厚，后劲绵长。', wealth:'正财稳健增长，不宜冒进，守成为主，积累财富更可靠。', career:'执行与配合见长，稳中求进，踏实积累，贵人在暗处相助。', love:'感情温厚持久，宜柔和相处，主动表达，缘分水到渠成。', health:'宜静养调息，注意脾胃消化，饮食规律，切忌过劳。'},
+/* 3*/  {name:'水雷屯',  key:'万事初创', fav:3, general:'初创之难，前途有阻，需沉住气扎稳根基，坚持终见曙光。', wealth:'财运初启，多有阻碍，切忌贪进，宜小额稳健积累。', career:'事业起步阶段，困难重重但前景可期，需耐心积累人脉经验。', love:'感情起步不顺，需多沟通、多包容，初期波折终归甜蜜。', health:'体力较弱，宜循序渐进调养，忌剧烈运动，注意腰肾。'},
+/* 4*/  {name:'山水蒙',  key:'启蒙求知', fav:3, general:'蒙昧未开，此时需虚心求教，寻访明师，切忌刚愎自用。', wealth:'财运不明朗，需多学习理财知识，暂缓大额投资，稳字当头。', career:'事业尚需磨炼，拜师学艺最为重要，打好基础日后腾飞。', love:'感情尚不成熟，需增进了解，双方用心沟通，感情才能稳固。', health:'注意作息规律，莫忽视身体小警报，定期检查，防患未然。'},
+/* 5*/  {name:'水天需',  key:'等待时机', fav:3, general:'需字当头，时机未到，静待天时，守正不出，贵人自来。', wealth:'财运蓄势待发，现在宜守不宜攻，等待合适时机再行布局。', career:'晋升时机尚未成熟，储备实力、扩展人脉，机遇将在不久降临。', love:'感情宜稳步推进，不要急于求成，慢慢温养，缘分自然到来。', health:'宜静养调息，保持心境平和，不可焦虑，身体自然安康。'},
+/* 6*/  {name:'天水讼',  key:'慎防争讼', fav:2, general:'争讼之卦，口舌是非多，凡事退让为上，切勿激化矛盾。', wealth:'财务纠纷风险高，合同细节务必核清，忌与人共投、防诈骗。', career:'职场竞争激烈，是非口舌多，低调行事，避免正面冲突。', love:'感情摩擦增多，双方各执一词，需一方主动退让，和气生财。', health:'精神压力大，易引发头痛心烦，学会放松减压，舒缓情绪。'},
+/* 7*/  {name:'地水师',  key:'统帅运筹', fav:3, general:'军师之卦，需统筹全局，以柔克刚，借助团队力量方能成事。', wealth:'财运需团队合作方能开拓，借助贵人资源，共同分利。', career:'适合以团队为依托推进事业，发挥领导统筹能力，功成可期。', love:'感情需主动经营，多关心对方，统筹兼顾家庭与事业平衡。', health:'注意劳累过度，宜劳逸结合，避免长期高压导致身体损耗。'},
+/* 8*/  {name:'水地比',  key:'亲比合群', fav:4, general:'比邻而居，合作共赢，此时适合广结善缘，借力他人资源。', wealth:'财运借助人际关系大进，合作项目吉利，贵人带财入门。', career:'借助合伙与人脉，事业运势大增，共同创业或携手合作均吉。', love:'感情运旺，桃花频现，单身者易遇良缘，已婚者感情升温。', health:'心情愉悦则身体自健，维系好人际关系，社交促进身心健康。'},
+/* 9*/  {name:'风天小畜', key:'小有积蓄', fav:3, general:'小有积累，蓄势待发，暂时受阻不必气馁，一步一步向前走。', wealth:'财运有小进，不宜追求大富贵，稳健积累，月月有余。', career:'事业小有收获，距离大目标尚有距离，继续深耕，积累资历。', love:'感情小有进展，双方增进了解，缘分在慢慢加深，不急不躁。', health:'身体小有不适，注意休息调养，保持良好作息，慢慢恢复。'},
+/*10*/  {name:'天泽履',  key:'谨慎前行', fav:3, general:'履虎尾，慎之又慎，越是危险之地越要步步为营，终可无咎。', wealth:'财运需谨慎操作，避免高风险投资，一步一个脚印稳赚。', career:'职场如履薄冰，言行务必谨慎，内部竞争激烈，需保持低调。', love:'感情需谨慎，勿因冲动言语伤人，多思而后行，珍惜眼前人。', health:'健康需注意安全，避免危险运动，脚部、关节需重点保护。'},
+/*11*/  {name:'地天泰',  key:'吉祥通泰', fav:5, general:'天地交泰，万物通达，是运势最旺之卦，诸事皆宜，大吉大利。', wealth:'财运亨通，正财偏财双旺，投资生意均大吉，财源滚滚而来。', career:'事业春风得意，晋升、合作均顺，贵人频至，功名可期。', love:'感情美满幸福，伴侣相互扶持，婚姻大吉，家庭和谐美满。', health:'身体健康状况极佳，精力充沛，宜适当运动，保持最佳状态。'},
+/*12*/  {name:'天地否',  key:'闭塞待变', fav:2, general:'天地不交，万物不通，此时闭关蓄势，暂时退守待时而动。', wealth:'财运暂时受阻，切忌强行突破，守住现有资产，等待时机。', career:'事业发展受阻，晋升无望，宜审时度势，韬光养晦，静待转机。', love:'感情陷入僵局，双方心有隔阂，需改变沟通方式，打开心扉。', health:'身体状况低迷，情绪抑郁影响健康，宜多户外活动，调节心情。'},
+/*13*/  {name:'天火同人', key:'同心协力', fav:4, general:'同人于野，众志成城，此时合作共赢，志同道合者聚力成大事。', wealth:'财运借助合作关系大进，找对合伙人，利益共享，财源广开。', career:'适合联合志同道合之人共同创业，或在团队中发挥核心作用。', love:'感情和谐同心，双方志趣相投，是长期稳定感情的良好基础。', health:'身心俱佳，社交活跃有益健康，与志同道合朋友共同运动养生。'},
+/*14*/  {name:'火天大有', key:'丰收大吉', fav:5, general:'大有之象，财源广聚，万物皆备，此乃最吉之卦，大吉大利。', wealth:'财运极旺，正财偏财双双爆发，是投资、创业、收获的最佳时机。', career:'事业如日中天，多方机遇涌现，展示实力把握机遇，成就斐然。', love:'感情丰收，有望结成良缘或婚姻，幸福美满，令人艳羡。', health:'精力旺盛，身体状况极佳，注意不可过度消耗，保持规律作息。'},
+/*15*/  {name:'地山谦',  key:'谦逊有德', fav:4, general:'谦者贵，满招损，此时愈谦愈进，低调行事天道佑之。', wealth:'财运稳健持续，低调理财，不炫耀，越谦逊越有贵人相助。', career:'谦逊是最好的职场策略，不露锋芒反而赢得信任，逐步上升。', love:'感情宜以谦和姿态对待伴侣，减少自我，多考虑对方，关系升温。', health:'保持谦逊平和的心态，身心压力小，自然健康，宜静练瑜伽太极。'},
+/*16*/  {name:'雷地豫',  key:'欢悦顺畅', fav:4, general:'豫象大吉，顺应天时，此时心情愉悦，万事顺遂，积极进取。', wealth:'财运因人脉与喜事带旺，口碑好引来财源，分享越多越有福。', career:'职场人际关系融洽，得下属与团队支持，事业顺遂推进。', love:'桃花大旺，感情甜蜜愉悦，双方关系升温，喜事将至。', health:'心情愉快身体自然健康，适当音乐休闲，活跃身心焕发活力。'},
+/*17*/  {name:'泽雷随',  key:'随机应变', fav:4, general:'随顺时势，因势利导，顺应潮流灵活应对，事事皆可成功。', wealth:'财运随机遇而来，灵活把握市场变化，跟随趋势投资可获丰收。', career:'事业随贵人带动而进，适时调整策略，跟上趋势才能脱颖而出。', love:'感情随缘而就，顺其自然不强求，正是这种心态最能吸引良缘。', health:'宜随季节调整作息饮食，顺应自然节律，身体自然调节至最佳。'},
+/*18*/  {name:'山风蛊',  key:'改革整顿', fav:3, general:'积弊已久，需大力整顿革新，此时挑战旧有，方能迎来新生。', wealth:'财务有陈旧问题需整顿，清查资产，杜绝漏洞，重新布局财富。', career:'事业需改革创新，旧有模式不再适用，勇于变革则前途光明。', love:'感情有旧伤需疗愈，直面问题解决积怨，感情才能重焕新生。', health:'需彻底调理身体旧患，改变不良生活习惯，接受全面健康检查。'},
+/*19*/  {name:'地泽临',  key:'临事亲为', fav:4, general:'高临视下，亲力亲为，此时主动参与把握机遇，成就非凡。', wealth:'财运临门，主动参与商机，把握眼前机遇，财源自然涌来。', career:'领导亲临，工作受重视，主动表现争取晋升，机不可失。', love:'感情进入关键时刻，主动亲近表达，是确立关系的最佳时机。', health:'此时宜积极锻炼，主动干预健康问题，体检结果令人满意。'},
+/*20*/  {name:'风地观',  key:'审时度势', fav:3, general:'观察内外，洞察全局，此时静观其变、广收信息，不急于行动。', wealth:'财运观望期，暂不宜大额操作，多观察市场，等待明确信号。', career:'宜冷静分析职场形势，广泛收集信息，谋定而后动，时机未至。', love:'感情观察期，了解对方真实想法，不要仓促表白，时机成熟再行动。', health:'定期做健康观察与自我评估，早发现早处理，预防重于治疗。'},
+/*21*/  {name:'火雷噬嗑', key:'明断是非', fav:3, general:'噬嗑用刑，有阻碍需强力突破，据理力争，明断是非可成。', wealth:'财务有纠纷或障碍，需主动出面解决，据理力争，方能收回。', career:'职场有障碍需正面突破，讲清道理，展现能力，方能晋升。', love:'感情有摩擦需正面沟通解决，不可回避，坦诚面对反而更好。', health:'有旧患需积极治疗，不可拖延，尽快处理，彻底治愈最重要。'},
+/*22*/  {name:'山火贲',  key:'文采华美', fav:3, general:'贲为文饰，华美外表吸引眼球，注意内外兼修，勿以表面迷人。', wealth:'财运受包装形象影响，提升品牌与个人形象可带来更多财源。', career:'善用表达与包装，优秀呈现能力助力晋升，但须以实力为根基。', love:'感情注重情调与仪式感，提升外在形象，吸引对方目光更有力。', health:'外在形象与内在健康同步维护，美容养生并重，由内而外焕发光彩。'},
+/*23*/  {name:'山地剥',  key:'剥落休整', fav:1, general:'剥落之象，万物凋零，此时收手保守，切勿冒进，待机而动。', wealth:'财运大凶，切勿投资冒险，防止财富流失，保住现有即为成功。', career:'事业低谷，晋升无望，避免得罪人，低调待时，韬光养晦。', love:'感情受损，破裂风险高，需冷静处理，挽回需要极大耐心。', health:'健康状况堪忧，需立即就医检查，切忌讳疾忌医，积极调理。'},
+/*24*/  {name:'地雷复',  key:'否极泰来', fav:4, general:'一阳来复，冬去春来，低谷已过，复苏在即，否极必泰来。', wealth:'财运触底反弹，复苏信号已现，适度布局，财运将逐步回升。', career:'事业经历低谷后开始复苏，重新出发，积累的经验将发光发热。', love:'感情经历冷淡后回温，双方重新靠近，旧情复燃或新缘将至。', health:'病后恢复或体力慢慢回升，坚持调养，元气将全面回归。'},
+/*25*/  {name:'天雷无妄', key:'纯正无私', fav:4, general:'无妄之道，纯正无私，只要行事正直无私，天道自然眷顾。', wealth:'财运自然而来，不可强求，以正道经营，意外之财也会降临。', career:'以正直与诚信为本，事业自然顺遂，贵人赏识，功名自得。', love:'感情真诚纯粹，不带任何功利心，纯粹的爱最能打动对方。', health:'顺应自然作息，无需刻意强求，保持平和心态，健康自然常在。'},
+/*26*/  {name:'山天大畜', key:'厚积厚蓄', fav:4, general:'大量积蓄，蓄势待发，此时广积人脉知识资本，必将大有作为。', wealth:'财富大量积累中，宜持续投入与储蓄，厚积薄发，时机成熟必爆发。', career:'能力与资源积累充分，时机将至，继续深耕，大展宏图指日可待。', love:'感情深厚积累，水到渠成，双方感情基础越来越稳固，可期白头。', health:'精力大量储备，适度调养，不宜过度消耗，养精蓄锐备战高峰。'},
+/*27*/  {name:'山雷颐',  key:'颐养正道', fav:3, general:'颐养之道，慎言谨食，修养身心，以正道滋养方能长久。', wealth:'财运需滋养积累，不宜速成暴富，以正道经营方能持久丰厚。', career:'事业需稳健滋养，不急于晋升，扎实提升技能，厚积必薄发。', love:'感情需悉心滋养，多陪伴多关怀，不求速成，日久见真情。', health:'最重保养调息，饮食有节，睡眠充足，从内滋养，气色自然红润。'},
+/*28*/  {name:'泽风大过', key:'力排众议', fav:2, general:'大过之象，超出常规，需谨慎应对压力，切勿冒险过度。', wealth:'财务压力过大，负债与风险超标，须立即减仓降险，收缩战线。', career:'工作压力超出承受范围，需调整节奏，适当减压，防止崩溃。', love:'感情压力或期待过大，需降低要求，顺其自然，过度强求适得其反。', health:'健康警报，过度劳累导致亚健康，需立即休养，勿再超负荷。'},
+/*29*/  {name:'坎为水',  key:'险中求存', fav:2, general:'重险之卦，重重困难包围，需保持定力，以智慧化险为夷。', wealth:'财运险象环生，高风险投资坚决回避，守住底线，平安是福。', career:'职场如临深渊，危机四伏，以静制动，坚守原则可化险为夷。', love:'感情处于低潮与危机，需坚持信任与包容，共渡难关反而深情。', health:'健康有险，需重视身体信号，及时就医，忌讳疾忌医拖延病情。'},
+/*30*/  {name:'离为火',  key:'明丽光明', fav:4, general:'离火光明，明察秋毫，此时智慧大开，一切清晰可见，大吉之象。', wealth:'财运光明，思路清晰，识别机遇能力强，适当投资可获丰收。', career:'才华光芒绽放，受上级赏识，晋升机遇清晰可见，把握即可。', love:'感情明朗热情，表达真感情，对方清晰感受到，关系迅速升温。', health:'精力充沛如烈火，注意防止过旺伤阴，多补水，保持阴阳平衡。'},
+/*31*/  {name:'泽山咸',  key:'感应交融', fav:4, general:'咸感之道，心心相印，此时感情与人际极为敏锐，贵人易感召。', wealth:'财运因感情与社交而进，善用情感连接，贵人相助财源自来。', career:'职场感召力强，人际关系良好，合作共赢，感召贵人助力晋升。', love:'感情磁场强大，相互吸引，桃花极旺，是确立关系最佳时机。', health:'情绪对健康影响大，心情好身体自然好，维持积极情绪是关键。'},
+/*32*/  {name:'雷风恒',  key:'持之以恒', fav:4, general:'恒常之道，坚持不懈，此事需长期坚守，方能厚积薄发大成。', wealth:'财运持续增长，坚持长期投资复利，切忌中途放弃，坚守必丰收。', career:'事业需持之以恒，长期坚守，积累越深，收获越大，勿半途而废。', love:'感情历久弥新，坚守承诺与信任，长期陪伴，是最动人的爱。', health:'坚持规律运动与饮食习惯，持之以恒，健康状况日益改善。'},
+/*33*/  {name:'天山遁',  key:'急流勇退', fav:3, general:'遁退之时，勇敢退守蓄势，此时退一步是战略性蓄力，非失败。', wealth:'财运暂时收缩，此时退出高风险市场，保守守财是最明智之举。', career:'职场形势不利，暂时低调退守，避开锋芒，养精蓄锐待机而动。', love:'感情需要一定空间与距离，适度退后反而让对方更珍惜你。', health:'适当休养退出高压状态，给身体充分休息，静养调息方为正道。'},
+/*34*/  {name:'雷天大壮', key:'雷霆万钧', fav:4, general:'大壮之时，气势如虹，正处巅峰，可大展拳脚，但须防过刚。', wealth:'财运强劲，冲劲十足，可主动出击，把握机遇，但避免过度冒险。', career:'事业正值巅峰，精力充沛，把握机遇全力冲刺，成就指日可待。', love:'感情热烈大胆，主动出击有效，感情势如破竹，进展迅速。', health:'身体强壮精力旺盛，适合高强度运动，但勿过刚伤身，注意防伤。'},
+/*35*/  {name:'火地晋',  key:'晋升光明', fav:5, general:'晋升之卦，如日中天，光明在前，主动晋升必得，贵人赏识。', wealth:'财运晋升明显，升职加薪带动财富增长，贵人举荐带来大财。', career:'最佳晋升时机，贵人举荐，主动争取必成，事业快速攀升。', love:'感情快速升温，进展顺畅，确立关系乃至婚约的绝佳时机。', health:'身体精力状态全面提升，健康晋级，旧疾消退，体力恢复。'},
+/*36*/  {name:'地火明夷', key:'韬光养晦', fav:2, general:'光明受损，此时低调隐忍，韬光养晦，保存实力待时而动。', wealth:'财运受压，暂避锋芒，不显富，低调理财，守住资产最重要。', career:'职场不顺，受压制，切勿正面冲突，低调隐忍，等待时机翻身。', love:'感情受阻，不宜明显表达，低调观察，暗中守护，时机到再表白。', health:'注意隐性健康问题，切勿表面无事就忽视，定期深度检查身体。'},
+/*37*/  {name:'风火家人', key:'家和万事兴', fav:4, general:'家人和睦，内外兼修，家庭是最大的支柱，以家为本诸事顺。', wealth:'家族财运联动，家人协力可带来更多财源，家和则财旺。', career:'得家人支持，后顾无忧，事业推进更加顺利，家庭是最大后盾。', love:'感情稳固，家庭生活幸福，夫妻相互扶持，是最羡慕的幸福。', health:'家庭氛围对健康影响深远，家和心情好，身体自然强健。'},
+/*38*/  {name:'火泽睽',  key:'求同存异', fav:2, general:'睽卦主异，双方观念相左，需求同存异，不可强求一致。', wealth:'财务上与合伙人意见相左，各执己见增加风险，宜暂时分开操作。', career:'职场与同事上司理念不合，需寻求共同点，不可正面对抗。', love:'感情观念差异大，需双方各退一步，求同存异才能长久。', health:'身心不协调，内外失衡，需综合调理，注意心理与生理同步改善。'},
+/*39*/  {name:'水山蹇',  key:'遇险静待', fav:2, general:'蹇难重重，寸步难行，此时不宜强行推进，等待援手助力。', wealth:'财运严重受阻，投资暂停，保守守财，等待专业人士建议。', career:'事业遇到极大阻碍，需借助外力与贵人，自行突破难度极高。', love:'感情陷入僵局，需引入第三方建议或重新审视，化解难题。', health:'健康遇到顽疾或困难，需寻求专业医生帮助，自行调理效果有限。'},
+/*40*/  {name:'雷水解',  key:'化险为夷', fav:4, general:'解险之象，困境解除，如春雷后雨，万物舒展，问题迎刃而解。', wealth:'财运解困，之前的财务困境开始化解，新的财源即将涌入。', career:'职场困境化解，之前的阻碍消散，晋升或转机即将到来。', love:'感情化冰，之前的隔阂或冷淡开始消融，关系重新升温。', health:'旧疾开始化解，身体逐步恢复，坚持治疗调养，完全康复在望。'},
+/*41*/  {name:'山泽损',  key:'损之益之', fav:3, general:'损者，减损以利长远，适当牺牲眼前，换取未来更大的收益。', wealth:'近期财运有所损耗，但此损为积累未来大财，投入正道。', career:'当下付出多回报少，但此番积累是为日后大成，坚持不放弃。', love:'感情需要一方付出更多，以小损换大利，牺牲换来深厚情谊。', health:'某些需要损耗的治疗或调理值得坚持，短痛换长期健康。'},
+/*42*/  {name:'风雷益',  key:'增益获利', fav:5, general:'增益大吉，上下皆喜，此时所做一切皆有加倍回报，乃吉卦。', wealth:'财运倍增，投资收益超预期，各路财源汇聚，大有斩获。', career:'事业增益，付出有回报，晋升加薪顺理成章，贵人推波助澜。', love:'感情增温，互有付出互有回报，双方关系越来越甜蜜深厚。', health:'健康状况全面改善，调养有显著成效，精力与气色均好转。'},
+/*43*/  {name:'泽天夬',  key:'决断除旧', fav:4, general:'夬为决断，当机立断除去弊端，果断行动扫清障碍，方可前进。', wealth:'果断清除财务中的不良资产，当断则断，以决断换取财运通畅。', career:'职场中需果断处理拖延的问题，不犹豫，大刀阔斧，方能通达。', love:'感情需果断表白或果断放下，迟疑不决只会错失，决断方成。', health:'健康问题需立即就医，果断治疗，拖延只会加重，当机立断最佳。'},
+/*44*/  {name:'天风姤',  key:'邂逅机遇', fav:3, general:'姤为邂逅，意外相遇带来机遇，但也须防小人，辨清来者之意。', wealth:'财运因意外邂逅而来，偶然的商机或贵人引荐，不可错过。', career:'职场意外相遇的贵人或机遇，随时留意周围，机缘就在眼前。', love:'感情邂逅，意外相遇带来缘分，但需辨别真心，谨防花言巧语。', health:'意外信息带来健康改善的灵感或疗法，随时留意有益信息。'},
+/*45*/  {name:'泽地萃',  key:'聚合众力', fav:4, general:'萃卦聚集，人聚力强，此时聚合资源与人才，大事可成。', wealth:'财运因聚集而旺，合伙投资或众筹项目大吉，资金聚合效果好。', career:'聚集团队，众志成城，此时是组建团队、发起大项目的最佳时机。', love:'感情因聚会与社交而来，多参加活动，人群中遇到命中之人。', health:'聚集正能量，与积极人群为伍，心情好身体自然强健。'},
+/*46*/  {name:'地风升',  key:'稳步上升', fav:4, general:'升卦上升，循序渐进，一步一步往上走，稳健上升终登高峰。', wealth:'财运稳步上升，不急不躁持续积累，财富如升势平稳增长。', career:'事业稳步晋升，坚持努力自有贵人推荐，厚积薄发终登高位。', love:'感情稳步升温，循序渐进最为稳固，不急于求成感情更深厚。', health:'健康状况逐步改善，持续调养，身体机能一级一级稳步恢复。'},
+/*47*/  {name:'泽水困',  key:'困境磨志', fav:2, general:'困卦重重，处处受阻，但君子处困不气馁，磨炼意志终翻身。', wealth:'财运困乏，资金紧张，节流为主，严格控制开支，等待转机。', career:'事业困顿，处处碰壁，磨炼耐心，积累实力，等待转机到来。', love:'感情受困，双方都不容易，共渡难关反而情深，真爱经得起考验。', health:'身体困于顽疾或疲惫，需系统性调理，切忌心浮气躁，静心疗愈。'},
+/*48*/  {name:'水风井',  key:'养德滋源', fav:3, general:'井卦养源，君子以深挖智慧之源，自我提升才是不竭之泉。', wealth:'财运源于自我提升，投资自己的技能与知识，财源自然不断涌出。', career:'深耕专业如挖井，越深越有价值，做行业内不可替代的专家。', love:'以内在涵养吸引伴侣，深厚的人格魅力是最持久的吸引力。', health:'保持养生规律，滋养内在元气，如清泉源源不断，健康常在。'},
+/*49*/  {name:'泽火革',  key:'革故鼎新', fav:4, general:'革新之时，破旧立新，此乃改变与突破的大好时机，大胆革新。', wealth:'财运因革新而来，改变旧有方式，新的商业模式带来财富爆发。', career:'事业革新关键期，改变不适合的做法，创新驱动事业跨越式发展。', love:'感情需要革新，打破旧有模式，尝试新相处方式，感情焕然一新。', health:'革除不良习惯，改变旧有生活方式，从根本上改善健康状况。'},
+/*50*/  {name:'火风鼎',  key:'炉火纯青', fav:5, general:'鼎卦大吉，革故鼎新，如炉中冶炼，历经磨炼后功成名就。', wealth:'财运因工艺与专业而兴，依靠专业技能创造价值，财源稳定丰厚。', career:'事业到达炉火纯青境界，专业权威得到认可，声誉带来高回报。', love:'感情历久弥新，如烹饪出的佳肴，双方互相滋养，越来越美好。', health:'身心已进入良好平衡状态，保持规律即可，健康状况堪称理想。'},
+/*51*/  {name:'震为雷',  key:'震动奋起', fav:3, general:'雷声大震，先惊后安，遇突发事件勿惊，镇定应对，吉。', wealth:'财运有突发波动，勿慌乱，镇定应对，反而能从波动中获利。', career:'职场有突发变化，保持冷静，以不变应万变，危机中孕育机遇。', love:'感情有突发矛盾或刺激，冷静面对，雷过天晴，感情反而升温。', health:'身体有突发不适，不要恐慌，就医检查，多为虚惊，平稳调理即可。'},
+/*52*/  {name:'艮为山',  key:'静止守定', fav:3, general:'艮止之象，此时当止则止，不妄动，静定如山，以静待动。', wealth:'财运宜静守，暂停所有投机行为，守住现有财富，不动如山。', career:'职场宜稳守本职，不主动争抢，让时机自然到来，静待晋升。', love:'感情需要静止期，给彼此独处空间，山一样的沉稳更令对方安心。', health:'最宜静养，减少外出活动，冥想、瑜伽、静坐，让身心沉淀。'},
+/*53*/  {name:'风山渐',  key:'循序渐进', fav:4, general:'渐进之象，急不得，按部就班循序渐进，一步步稳步成就大事。', wealth:'财运循序渐进，不求暴富，每步踏实，积累越来越丰厚。', career:'事业稳步推进，不跳级晋升，每一步都扎实，厚积薄发之象。', love:'感情缓慢升温，按步就班，不急于求成，最终水到渠成。', health:'健康需要渐进式改善，规律调养，不求一蹴而就，坚持见成效。'},
+/*54*/  {name:'雷泽归妹', key:'冲动需戒', fav:2, general:'归妹卦含冲动之意，此时行事勿冲动，顺势而为，谨慎决定。', wealth:'财运因冲动决策而受损，控制冲动，冷静理性，方避财务失误。', career:'职场冲动行事易招祸，克制情绪，谨言慎行，方保职场稳健。', love:'感情勿因一时冲动而决定，冷静思考，是否是合适的对象。', health:'情绪波动影响健康，控制冲动与压力，平稳情绪有益身心。'},
+/*55*/  {name:'雷火丰',  key:'丰盛之极', fav:5, general:'丰盛之象，最为繁盛之时，万事俱备，把握高峰，大有作为。', wealth:'财运极旺，丰收之象，各路财源汇聚，主动把握丰盛时机。', career:'事业至繁盛之极，所有积累在此爆发，把握高峰机遇全力冲刺。', love:'感情丰富多彩，桃花最旺，恋爱、婚姻均吉，幸福满溢。', health:'精力丰沛身体强壮，是最适合挑战体能极限的时候，运动锻炼最佳。'},
+/*56*/  {name:'火山旅',  key:'旅途谨慎', fav:3, general:'旅人之象，处处谨慎，寄人篱下宜低调，过客之身勿恋战。', wealth:'财运如旅途，变动不定，谨慎保守，避免在外地或陌生领域冒进。', career:'职场环境变动，如旅途不定，暂时低调，等待稳定落脚点。', love:'感情若旅途，变幻不定，谨慎慢走，不宜快进，容易来去匆匆。', health:'旅行或出行期间注意饮食起居，异地水土需要适应，保护身体。'},
+/*57*/  {name:'巽为风',  key:'顺势入微', fav:3, general:'巽风入微，顺势而入，此时柔和渗透比强攻更有效，润物无声。', wealth:'财运宜顺势渗透，柔和进入新市场，如风无孔不入，细水长流。', career:'以柔和方式推进工作，渗透影响力，比强硬更能达成目标。', love:'感情宜温柔渗透，用细心与体贴慢慢打动对方，效果胜于猛烈追求。', health:'宜轻柔调理身体，如风一般温和，避免急剧的运动或饮食变化。'},
+/*58*/  {name:'兑为泽',  key:'喜悦畅达', fav:4, general:'兑为喜悦，言语畅达，此时表达沟通顺畅，人际关系和谐融洽。', wealth:'财运因社交与口才而进，善用言语沟通，合作与销售均顺利。', career:'表达能力助力职场晋升，此时是争取资源、展示自我的好时机。', love:'感情甜蜜喜悦，善用语言表达爱意，对方感受到喜乐，关系升温。', health:'心情愉悦是最好的健康良药，保持喜悦心态，身体自然安康。'},
+/*59*/  {name:'风水涣',  key:'涣散重聚', fav:3, general:'涣散之后重新聚合，此时化解积怨，重整心情，重新出发。', wealth:'财务有涣散之象，整合资产，重新规划理财方向，聚气聚财。', career:'团队或方向有涣散，重新整合凝聚方向，统一目标方可出发。', love:'感情有疏远或冷淡，重新点燃热情，挽回对方心意，重聚温情。', health:'精力有涣散疲惫之感，通过休息重整，重新聚集元气再出发。'},
+/*60*/  {name:'水泽节',  key:'有节有度', fav:3, general:'节卦主节制，凡事有度，约束自己守正道，节制方能长久。', wealth:'财运需节制，控制消费欲望，量入为出，节流也是聚财。', career:'职场节制言行，不越权不逾矩，在规则内发挥，反获更多信任。', love:'感情节制，给彼此适当空间，不过于黏腻控制，反而关系更稳健。', health:'节制饮食与作息，不过度也不不足，适度才是最好的养生之道。'},
+/*61*/  {name:'风泽中孚', key:'诚信至上', fav:4, general:'中孚之道，以诚信感动天地，此时真诚以待，必获真心回应。', wealth:'财运因诚信而旺，守信用、重承诺，客户与贵人自然长期追随。', career:'以诚信为核心竞争力，受上下信赖，晋升机会水到渠成。', love:'感情以真诚感动对方，不用技巧，一颗真心胜过千言万语。', health:'内心诚实，接受自己的健康状况，积极面对，诚信就医康复更快。'},
+/*62*/  {name:'雷山小过', key:'小事谨慎', fav:3, general:'小过卦，小事可为，大事谨慎，此时量力而行，不可好高骛远。', wealth:'财运宜小打小闹，不宜大额冒险，小额稳健积累，量力而行。', career:'职场小事可推进，大项目暂缓，脚踏实地完成眼前任务更重要。', love:'感情小细节中展现爱意，不追求轰轰烈烈，小浪漫最打动人心。', health:'注意身体小毛病不可忽视，小患若忽视会酿成大病，及时调理。'},
+/*63*/  {name:'水火既济', key:'功成圆满', fav:4, general:'既济者，大事已成，功德圆满，守住成果，防止由盛转衰。', wealth:'财运已成，守住已有财富，防止在成功后因骄傲而失去，稳中求进。', career:'事业阶段性目标已达成，守成巩固，防止由盛而衰，再谋新局。', love:'感情功德圆满，进入稳定美好阶段，珍惜维护，防止倦怠期。', health:'健康状况已调理至理想，保持良好习惯，防止松懈导致反弹。'},
+/*64*/  {name:'火水未济', key:'功未竟成', fav:3, general:'未济者，功未竟成，仍在过渡中，但方向正确，终必成功。', wealth:'财运在酝酿突破，尚未成型，坚持正确方向，成功只是时间问题。', career:'事业处于蜕变阶段，困境是蜕变的前兆，方向正确终必突破。', love:'感情未完全确立，仍在磨合过渡，坚持沟通，必将水到渠成。', health:'健康仍在调理过程中，治疗方向正确，坚持不懈，必有完全康复之日。'},
+];
+
+// 六爻动爻爻辞库（key = 卦序号-爻位 1-6）
+const YAO_TEXTS = {
+  '1-1':'初九：潜龙勿用。蛰伏待时，此刻不宜轻举妄动，厚积薄发，等待天时降临。',
+  '1-2':'九二：见龙在田，利见大人。贵人出现，把握与上位者交流机会，必有助益。',
+  '1-3':'九三：君子终日乾乾，夕惕若厉。勤勉不懈，警惕风险，主动出击是正道。',
+  '1-4':'九四：或跃在渊，无咎。抉择关键时刻，进退皆可，顺势而为无过失。',
+  '1-5':'九五：飞龙在天，利见大人。运势登顶，贵人相助，大展宏图的最佳时机。',
+  '1-6':'上九：亢龙有悔。位极则衰，此爻动则须防物极必反，适可而止。',
+  '2-1':'初六：履霜，坚冰至。危机初现，及早察觉处理，防患于未然。',
+  '11-1':'初九：拔茅茹，以其汇，征吉。同类相聚，携手前进，共同行动则吉。',
+  '11-5':'六五：帝乙归妹，以祉元吉。以谦逊之心成就大事，得贵人之助，大吉。',
+  '35-1':'初六：晋如摧如，贞吉。晋升之路有阻碍，但坚守正道必然成功。',
+  '42-1':'初九：利用为大作，元吉，无咎。此爻动大吉，放手大胆行动，必获成功。',
+  '55-1':'初九：遇其配主，虽旬无咎，往有尚。遇到志同道合的伙伴，共同前进大吉。',
+};
+
+// 六爻问卦：问题类型关键词识别
+function detectQuestionType(q) {
+  if (/财|钱|投资|生意|股|基金|项目|收入|借|贷|合同|合同|买|卖/.test(q)) return 'wealth';
+  if (/工作|事业|升职|晋升|职位|创业|上司|同事|业务|项目|跳槽/.test(q)) return 'career';
+  if (/感情|爱情|婚姻|恋爱|对象|男友|女友|分手|追|暗恋|结婚|离婚/.test(q)) return 'love';
+  if (/健康|病|身体|医|手术|检查|疗|养|康/.test(q)) return 'health';
+  return 'general';
+}
+
+// 动爻数量说明
+function movingDesc(count) {
+  if (count === 0) return '本卦无动爻，卦象稳定，以本卦卦辞为准判断。';
+  if (count === 1) return '一爻动，力量集中，以该动爻爻辞为断事核心，指向清晰。';
+  if (count === 2) return '二爻动，以上爻为主，变卦为辅，可见近期走势之变化。';
+  if (count === 3) return '三爻动，动静各半，以本卦上卦与变卦下卦综合判断。';
+  if (count === 4) return '四爻动，以变卦下两爻为断，变化居主导，格局将大转。';
+  if (count === 5) return '五爻动，以变卦唯一不动爻为核心，变化彻底，须顺势而为。';
+  return '六爻皆动，乾坤互变，大吉大凶各有所主，以变卦卦辞为最终裁断。';
+}
+
+// 渲染一根爻的HTML（含动爻样式）
+function renderLine(lineVal, lineNum) {
+  const isYang = lineVal === 7 || lineVal === 9;
+  const isMoving = lineVal === 6 || lineVal === 9;
+  const movingClass = isMoving ? (isYang ? ' hex-moving-yang' : ' hex-moving-yin') : '';
+  const marker = isMoving ? `<span class="hex-line-marker">${lineVal === 9 ? '○' : '×'}</span>` : `<span class="hex-line-marker" style="opacity:0">·</span>`;
+  if (isYang) {
+    return `<div class="hex-line${movingClass}">${marker}<div class="hex-line-yang"></div></div>`;
+  } else {
+    return `<div class="hex-line${movingClass}">${marker}<div class="hex-line-yin"><span></span><span></span></div></div>`;
+  }
+}
+
+// 从6根爻值（6/7/8/9）计算本卦/变卦，生成完整解读HTML
+function castAndRender(question, seed) {
+  // 生成6根爻值（底→顶）
+  const rand = seededRand(seed);
+  const lineVals = Array.from({length:6}, () => {
+    // 模拟三枚铜钱：正=3,背=2；老阳=9(3+3+3)，少阴=8(3+3+2 or 3+2+2 no)
+    // 实际: 三枚各自 正(3)背(2): 总6=老阴,7=少阳,8=少阴,9=老阳
+    const coins = [rand()<0.5?3:2, rand()<0.5?3:2, rand()<0.5?3:2];
+    return coins[0]+coins[1]+coins[2];
+  });
+
+  // 计算上下卦二进制（阳=1, 阴=0，底→顶）
+  const toBit = v => (v===7||v===9) ? 1 : 0;
+  const lowerBits = (toBit(lineVals[2])<<2) | (toBit(lineVals[1])<<1) | toBit(lineVals[0]);
+  const upperBits = (toBit(lineVals[5])<<2) | (toBit(lineVals[4])<<1) | toBit(lineVals[3]);
+
+  const hexNum = HEXAGRAM_TABLE[(upperBits << 3) | lowerBits];
+  const hex = HEXAGRAMS[hexNum];
+  const upperTri = TRIGRAM_INFO[upperBits];
+  const lowerTri = TRIGRAM_INFO[lowerBits];
+
+  // 变卦（将动爻取反）
+  const changedVals = lineVals.map(v => v===6?7 : v===9?8 : v);
+  const cLowerBits = (toBit(changedVals[2])<<2) | (toBit(changedVals[1])<<1) | toBit(changedVals[0]);
+  const cUpperBits = (toBit(changedVals[5])<<2) | (toBit(changedVals[4])<<1) | toBit(changedVals[3]);
+  const changeHexNum = HEXAGRAM_TABLE[(cUpperBits << 3) | cLowerBits];
+  const changeHex = HEXAGRAMS[changeHexNum];
+  const hasChange = lineVals.some(v => v===6||v===9);
+
+  const movingLines = lineVals.map((v,i)=>({v,i:i+1})).filter(x=>x.v===6||x.v===9);
+  const qType = detectQuestionType(question);
+  const favStars = n => '★'.repeat(n) + '☆'.repeat(5-n);
+
+  // 动爻爻辞
+  const yaoHtml = movingLines.length > 0 ? movingLines.map(ml => {
+    const key = `${hexNum}-${ml.i}`;
+    const yaoText = YAO_TEXTS[key] || `第${ml.i}爻动（${ml.v===9?'老阳':'老阴'}）：此爻变动，${ml.v===9?'阳极转阴，旺极防衰，把握当下盛时，及时收获成果。':'阴极转阳，否极泰来，坚持到底必见转机，新的开始即将到来。'}`;
+    return `<div class="liuyao-yao-item moving"><div class="yao-num">第${ml.i}爻动 · ${ml.v===9?'老阳变阴':'老阴变阳'}</div>${yaoText}</div>`;
+  }).join('') : `<div class="liuyao-yao-item"><div class="yao-num">卦象稳定</div>六爻皆静，无爻变动，卦象稳固持久，以本卦整体卦义直接判断，结果较为确定明朗。</div>`;
+
+  // 对问题类型的针对性解读
+  const contextAnswer = hex[qType] || hex.general;
+  const changeContext = hasChange ? (changeHex[qType] || changeHex.general) : '';
+
+  // 星级映射
+  const favMap = { 5:'大吉', 4:'吉', 3:'平', 2:'凶', 1:'大凶' };
+
+  return `
+    <div class="liuyao-result">
+      <div class="analysis-card" style="margin-bottom:16px">
+        <div class="analysis-card-title"><span class="icon">◉</span> 卦象揭示</div>
+        <div class="hexagram-pair">
+          <div class="hexagram-box primary">
+            <div class="hexagram-label">本　卦</div>
+            <div class="hexagram-name">${hex.name}</div>
+            <div class="hex-lines">
+              ${[5,4,3,2,1,0].map(i=>renderLine(lineVals[i], i+1)).join('')}
+            </div>
+            <div style="margin-top:10px;font-size:0.75rem;color:var(--text-dim)">${upperTri.symbol}${upperTri.name} / ${lowerTri.symbol}${lowerTri.name}</div>
+            <div class="hexagram-fav">${favStars(hex.fav)}</div>
+            <div class="hexagram-keyword">${hex.key}</div>
+          </div>
+          ${hasChange ? `
+          <div class="hexagram-box">
+            <div class="hexagram-label">变　卦</div>
+            <div class="hexagram-name">${changeHex.name}</div>
+            <div class="hex-lines">
+              ${[5,4,3,2,1,0].map(i=>renderLine(changedVals[i], i+1)).join('')}
+            </div>
+            <div style="margin-top:10px;font-size:0.75rem;color:var(--text-dim)">${TRIGRAM_INFO[cUpperBits].symbol}${TRIGRAM_INFO[cUpperBits].name} / ${TRIGRAM_INFO[cLowerBits].symbol}${TRIGRAM_INFO[cLowerBits].name}</div>
+            <div class="hexagram-fav">${favStars(changeHex.fav)}</div>
+            <div class="hexagram-keyword">${changeHex.key}</div>
+          </div>` : ''}
+        </div>
+        <p style="color:var(--text-dim);font-size:0.82rem;text-align:center;margin-top:8px">
+          ${movingDesc(movingLines.length)}
+        </p>
+      </div>
+
+      <div class="analysis-card" style="margin-bottom:16px">
+        <div class="analysis-card-title"><span class="icon">◈</span> 动爻解析</div>
+        <div class="liuyao-yao-list">${yaoHtml}</div>
+      </div>
+
+      <div class="analysis-card">
+        <div class="analysis-card-title"><span class="icon">☰</span> 断事指南</div>
+        <p style="color:var(--text-dim);font-size:0.82rem;margin-bottom:12px">所问：「${question}」</p>
+        <div class="liuyao-answer">
+          <strong>【${hex.name}】${favMap[hex.fav]}象</strong> — ${hex.general}
+          <br><br>
+          <strong>针对所问</strong>：${contextAnswer}
+          ${hasChange ? `<br><br><strong>【${changeHex.name}变卦指引】</strong>：${changeContext}` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 六爻模块初始化（每次进入命盘后渲染问卦区）
+function renderLiuyao(data, pillars) {
+  const baseSeed = data.year * 10000 + data.month * 100 + data.day + data.hour * 7;
+  const exampleQs = [
+    '最近工作上的事情有进展吗',
+    '这段感情有发展的可能吗',
+    '今年投资某项目是否合适',
+    '近期身体健康需要注意什么',
+    '换工作的时机到了吗',
+    '最近一笔生意能否顺利',
+  ];
+
+  return `
+    <div class="liuyao-ask">
+      <h3>☯ 六爻问卦 · 解惑断事</h3>
+      <p>心中怀一事，诚心起卦，六爻道天机，为你指点迷津</p>
+      <textarea id="liuyao-q" class="liuyao-question" placeholder="请写下您最近心中关注的一件事，越具体越准……"></textarea>
+      <div class="liuyao-examples">
+        ${exampleQs.map(q=>`<span class="liuyao-example-tag" onclick="document.getElementById('liuyao-q').value='${q}'">${q}</span>`).join('')}
+      </div>
+      <button class="liuyao-cast-btn" onclick="liuyaoCast(${baseSeed})">🪙 投币起卦</button>
+    </div>
+    <div id="liuyao-result-area"></div>
+  `;
+}
+
+// 点击"起卦"的交互动作
+function liuyaoCast(baseSeed) {
+  const q = document.getElementById('liuyao-q').value.trim();
+  if (!q) { alert('请先写下您想问的事情'); return; }
+
+  // 将问题内容混入seed，使不同问题得到不同结果
+  const qHash = [...q].reduce((h,c)=>((h<<5)-h+c.charCodeAt(0))|0, 0);
+  const timeSeed = Date.now() % 86400000; // 用当天时间增加随机性
+  const finalSeed = Math.abs(baseSeed + qHash + timeSeed);
+
+  const area = document.getElementById('liuyao-result-area');
+  area.innerHTML = `
+    <div class="analysis-card" style="text-align:center;padding:28px">
+      <p style="color:var(--gold);margin-bottom:18px;letter-spacing:.08em">正在摇卦，请诚心静候……</p>
+      <div class="coins-wrap">
+        <div class="coin">阳</div>
+        <div class="coin">阴</div>
+        <div class="coin">阳</div>
+      </div>
+      <p style="color:var(--text-dim);font-size:0.82rem">三枚铜钱六次落定，卦象生成中……</p>
+    </div>
+  `;
+  area.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  setTimeout(() => {
+    area.innerHTML = castAndRender(q, finalSeed);
+  }, 1600);
 }
 
 // ============================================================
@@ -1992,6 +2403,7 @@ function calculate() {
     document.getElementById('tab-love').innerHTML = renderLove(data, pillars, r6);
     document.getElementById('tab-health').innerHTML = renderHealth(data, pillars, elemCnt, r7);
     document.getElementById('tab-yearly').innerHTML = renderYearly(data, pillars, r8, shared);
+    document.getElementById('tab-liuyao').innerHTML = renderLiuyao(data, pillars);
 
     document.getElementById('results').classList.add('show');
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
