@@ -944,21 +944,28 @@ const WEALTH_GUIREN = {
   },
 };
 
-// 月度财运（扩充版）
-const MONTHLY_WEALTH = [
-  {icon:'★★★★★', text:'财星当令，正偏财双旺，投资决策极佳时机，宜主动出击，签约收款均吉'},
-  {icon:'★★★★☆', text:'贵人财助入命，商务合作旺盛，引荐与介绍带来意外财源'},
-  {icon:'★★★☆☆', text:'正财平稳，宜保守理财，深入学习投资知识，不宜大额操作'},
-  {icon:'★★★★☆', text:'偏财星动，有意外之财惊喜，副业收入与项目分红有进账'},
-  {icon:'★★☆☆☆', text:'比劫犯财，人际财务须谨慎，防借贷纠纷，暂缓大额投资'},
-  {icon:'★★★★★', text:'财库大开，年内最佳进财月，正财偏财齐旺，全力以赴'},
-  {icon:'★★★☆☆', text:'财运平稳，宜检视投资组合，清除低效资产，优化配置结构'},
-  {icon:'★★★★☆', text:'贵人带财入门，来自合伙人或老朋友的财务机遇不可忽视'},
-  {icon:'★★★☆☆', text:'财气受阻，保守为上，宜守不宜攻，审视现有资产安全性'},
-  {icon:'★★★★☆', text:'偏财旺盛，股权、基金表现较好，敏锐捕捉市场风向'},
-  {icon:'★★★★★', text:'年内财运第二高峰，正财偏财俱旺，布局来年计划正当时'},
-  {icon:'★★★★☆', text:'年末财运收官，盘点全年财务得失，为来年制定更精准的财富目标'},
-];
+// 月度财运文案（按星级分组，与年运共享同一套星级数据）
+const WEALTH_MONTH_TEXT = {
+  5: [
+    '财星当令，正偏财双旺，投资决策极佳时机，宜主动出击，签约收款均吉',
+    '财库大开，年内最旺进财月，正财偏财齐旺，全力布局财富格局',
+    '年内财运高峰，正财偏财俱旺，此月出手事半功倍，把握良机',
+  ],
+  4: [
+    '贵人财助入命，商务合作旺盛，引荐与介绍带来意外财源',
+    '偏财星动，有意外之财惊喜，副业收入与项目分红均有进账',
+    '贵人带财入门，来自合伙人或老友的财务机遇不可忽视',
+    '偏财旺盛，股权、基金表现较好，宜敏锐捕捉市场风向',
+    '财气上扬，年末收官盘点，为来年制定更精准的财富目标',
+  ],
+  3: [
+    '正财平稳，宜保守理财，深入学习投资知识，不宜大额操作',
+    '财运平稳，宜检视投资组合，清除低效资产，优化配置结构',
+    '财气受阻，保守为上，宜守不宜攻，审视现有资产安全性',
+    '比劫犯财，人际财务须谨慎，防借贷纠纷，暂缓大额投资',
+    '财运守成，积累实力为主，专注本职，财基稳固日后可期',
+  ],
+};
 
 // 事业文本库（大幅扩充）
 const CAREER_TEXTS = [
@@ -1375,7 +1382,41 @@ function renderFengshui(data, pillars, elemCnt, rand) {
   `;
 }
 
-function renderWealth(data, pillars, rand) {
+// 预计算所有跨模块共享数据，保证各模块数据不矛盾
+function buildShared(seed, pillars) {
+  const rand = seededRand(seed + 997);
+
+  // 十二月财运星级（财运模块与年运模块共用同一组数据）
+  const wealthMonthStars = Array.from({length: 12}, () => Math.floor(rand() * 3) + 3);
+
+  // 财运最旺的三个月（用于各模块文字引用）
+  const bestWealthMonths = wealthMonthStars
+    .map((s, i) => ({ s, m: i + 1 }))
+    .sort((a, b) => b.s - a.s)
+    .slice(0, 3)
+    .map(x => x.m)
+    .sort((a, b) => a - b);
+
+  // 事业关键月份（独立计算，与财运月份不同但同样确定）
+  const careerMonthStars = Array.from({length: 12}, () => Math.floor(rand() * 3) + 3);
+  const bestCareerMonths = careerMonthStars
+    .map((s, i) => ({ s, m: i + 1 }))
+    .sort((a, b) => b.s - a.s)
+    .slice(0, 3)
+    .map(x => x.m)
+    .sort((a, b) => a - b);
+
+  // 未来十年年运星级
+  const currentYear = new Date().getFullYear();
+  const yearStars = {};
+  for (let y = currentYear - 1; y <= currentYear + 9; y++) {
+    yearStars[y] = Math.floor(rand() * 3) + 3;
+  }
+
+  return { wealthMonthStars, bestWealthMonths, careerMonthStars, bestCareerMonths, yearStars };
+}
+
+function renderWealth(data, pillars, rand, shared) {
   const wt = pick(WEALTH_TEXTS, rand);
   const dominant = Object.entries({
     '木':0,'火':0,'土':0,'金':0,'水':0,
@@ -1412,13 +1453,19 @@ function renderWealth(data, pillars, rand) {
   const lucky = ['优质核心地段房产','指数基金长期定投','实业经营与品牌建设','版权与知识产权变现','股权天使投资','海外资产多元配置','农业大宗商品','艺术品与古玩收藏','私募股权基金','商业地产REITs'];
   const careful = ['高杠杆投机产品','民间高息借贷','无实质担保的理财','虚拟货币短线博弈','P2P类产品','传销式资金盘'];
 
-  const monthlyHtml = MONTHLY_WEALTH.map((m, i) => `
+  const monthlyHtml = MONTH_NAMES.map((m, i) => {
+    const starCount = shared.wealthMonthStars[i];
+    const textArr = WEALTH_MONTH_TEXT[starCount] || WEALTH_MONTH_TEXT[3];
+    const text = textArr[i % textArr.length];
+    const icon = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
+    return `
     <div class="year-card">
-      <div class="year-num">${MONTH_NAMES[i]}</div>
-      <div class="year-gz" style="font-size:0.8rem">${m.icon}</div>
-      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:5px;line-height:1.5">${m.text}</div>
+      <div class="year-num">${m}</div>
+      <div class="year-gz" style="font-size:0.8rem">${icon}</div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:5px;line-height:1.5">${text}</div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   const wealthPeak = pick(['35-42岁','38-45岁','32-40岁','40-50岁','42-48岁'], rand);
   const wealthMethod = pick(['积少成多的定期投资与复利积累','以实业为根基的稳健价值增值','善用资金杠杆的进取型资产配置','以知识与人脉变现的轻资产模式','多元化被动收入构建财务自由体系'], rand);
@@ -1563,7 +1610,7 @@ function renderWealth(data, pillars, rand) {
   `;
 }
 
-function renderCareer(data, pillars, rand) {
+function renderCareer(data, pillars, rand, shared) {
   const ct = pick(CAREER_TEXTS, rand);
   const scores = [
     { name:'事业总运', val: score(rand,70,28) },
@@ -1579,7 +1626,7 @@ function renderCareer(data, pillars, rand) {
   const workStyle = pick(['独立自主型，独当一面效率最高','团队协作型，在优秀团队中激发最大潜能','管理统筹型，擅长协调资源带领团队','专家顾问型，以专业知识为核心竞争力'], rand);
   const leaderType = pick(['魅力型领导：以感召力与激情带动团队','专业型领导：以深厚专业知识赢得信任','战略型领导：善于制定大方向，高瞻远瞩','服务型领导：以成就团队为己任，深受下属爱戴'], rand);
 
-  const keyMonths = [...new Set([Math.floor(rand()*12)+1, Math.floor(rand()*12)+1, Math.floor(rand()*12)+1])].sort((a,b)=>a-b);
+  const keyMonths = shared.bestCareerMonths;
 
   return `
     <div class="analysis-card">
@@ -1809,12 +1856,12 @@ function renderHealth(data, pillars, elemCnt, rand) {
   `;
 }
 
-function renderYearly(data, pillars, rand) {
+function renderYearly(data, pillars, rand, shared) {
   const currentYear = new Date().getFullYear();
   const years = [];
   for (let y = currentYear - 1; y <= currentYear + 9; y++) {
     const yp = getYearPillar(y);
-    const starCount = Math.floor(rand() * 3) + 3;
+    const starCount = shared.yearStars[y];
     years.push({ year: y, gz: yp.stem + yp.branch, stars: starCount, current: y === currentYear, yp });
   }
 
@@ -1828,7 +1875,7 @@ function renderYearly(data, pillars, rand) {
   const nextYear = years.find(y => y.year === currentYear + 1);
 
   const monthlyYearFortune = MONTH_NAMES.map((m, i) => {
-    const s = Math.floor(rand() * 3) + 3;
+    const s = shared.wealthMonthStars[i];
     return `<div class="year-card">
       <div class="year-num">${m}</div>
       <div class="year-gz" style="font-size:0.85rem">${stars(s)}</div>
@@ -1858,7 +1905,7 @@ function renderYearly(data, pillars, rand) {
       <div class="analysis-card-title"><span class="icon">☰</span> ${currentYear}年（${thisYear.gz}年）全年详解</div>
       <p>${currentYear}年为<strong style="color:var(--gold)">${thisYear.gz}年</strong>，整体运势：${yearDescMap[thisYear.stars] || '平稳之年，量力而行'}。命主今年流年五行与本命相${pick(['相合，吉气叠加，万事皆宜主动出击','相生，如沐春风，运势徐徐上升','中性，宜稳扎稳打积累为主','局部冲克，需把握好节奏不可冒进'], rand)}，全年基调${pick(['积极向好，上升趋势明显','稳中有进，守中有为','略有挑战，考验智慧与韧劲','大起大落，把握机遇化险为夷'], rand)}。</p>
       ${keyEvents.map(e=>`<p>${e}</p>`).join('')}
-      <p>今年需特别关注的月份：<strong style="color:var(--gold)">${[...new Set([Math.floor(rand()*12)+1, Math.floor(rand()*12)+1, Math.floor(rand()*12)+1])].sort((a,b)=>a-b).join('月、')}月</strong>，此期间或有重大变化，宜提前谋划，灵活应对，切勿措手不及。</p>
+      <p>今年需特别关注的月份：<strong style="color:var(--gold)">${shared.bestWealthMonths.join('月、')}月</strong>，此期间财运与事业运双双旺盛，宜提前谋划，把握机遇，切勿措手不及。</p>
     </div>
 
     <div class="analysis-card">
@@ -1934,14 +1981,17 @@ function calculate() {
           r5 = seededRand(seed + 5), r6 = seededRand(seed + 6),
           r7 = seededRand(seed + 7), r8 = seededRand(seed + 8);
 
+    // 预计算共享数据，确保各模块月运/年运数据完全一致，避免矛盾
+    const shared = buildShared(seed, pillars);
+
     document.getElementById('tab-bazi').innerHTML = renderBazi(data, pillars, elemCnt, r1);
     document.getElementById('tab-face').innerHTML = renderFace(data, pillars, r2);
     document.getElementById('tab-fengshui').innerHTML = renderFengshui(data, pillars, elemCnt, r3);
-    document.getElementById('tab-wealth').innerHTML = renderWealth(data, pillars, r4);
-    document.getElementById('tab-career').innerHTML = renderCareer(data, pillars, r5);
+    document.getElementById('tab-wealth').innerHTML = renderWealth(data, pillars, r4, shared);
+    document.getElementById('tab-career').innerHTML = renderCareer(data, pillars, r5, shared);
     document.getElementById('tab-love').innerHTML = renderLove(data, pillars, r6);
     document.getElementById('tab-health').innerHTML = renderHealth(data, pillars, elemCnt, r7);
-    document.getElementById('tab-yearly').innerHTML = renderYearly(data, pillars, r8);
+    document.getElementById('tab-yearly').innerHTML = renderYearly(data, pillars, r8, shared);
 
     document.getElementById('results').classList.add('show');
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
