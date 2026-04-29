@@ -669,7 +669,7 @@ function getMonthPillar(year, month) {
 
 function getDayPillar(year, month, day) {
   const d = new Date(year, month - 1, day);
-  const ref = new Date(1900, 0, 31); // 庚子日（甲子=0，庚子=6*10+0=60+0…简化）
+  const ref = new Date(1900, 0, 31); // 甲子日（diff=0 → si=0甲, bi=0子）
   const diff = Math.round((d - ref) / 86400000);
   const si = ((diff % 10) + 10) % 10;
   const bi = ((diff % 12) + 12) % 12;
@@ -699,7 +699,7 @@ function seededRand(seed) {
   let s = seed;
   return function() {
     s = (s * 1664525 + 1013904223) & 0xffffffff;
-    return (s >>> 0) / 0xffffffff;
+    return (s >>> 0) / 0x100000000; // 除以2^32，保证结果在[0,1)，永不等于1
   };
 }
 
@@ -1281,18 +1281,56 @@ const QIANWEN = [
   { text: '功成而弗居，是以不去', explain: '此签引《道德经》之义，主成功后不居功自傲。命主所取得的成就应保持低调，越是不炫耀，反而越能守住成果；越是不争功，往往反而得到更多认可与尊重。' },
 ];
 
-// 大运推算辅助
+// 大运推算（修正版）
 function getDaYun(data, pillars) {
-  const age = new Date().getFullYear() - data.year;
+  // 顺逆运：阳年干（甲丙戊庚壬，si偶）男命顺行；阴年干女命顺行；反之逆行
+  const yearStemYang = pillars[0].si % 2 === 0;
+  const forward = (yearStemYang && data.gender === 'male') || (!yearStemYang && data.gender === 'female');
+  const dir = forward ? 1 : -1;
+
+  // 起运年龄：出生日距下一个（顺）或上一个（逆）节，天数÷3取整（3天=1岁）
+  // 十二节近似日（每月小月节，1月=小寒约6日，依次类推）
+  const JIE_DAY = [6, 4, 6, 5, 6, 6, 7, 7, 8, 8, 7, 7];
+  const birth = new Date(data.year, data.month - 1, data.day);
+  function getJieDate(y, m) { return new Date(y, m, JIE_DAY[m]); } // m=0-based
+  let jie;
+  const bm = data.month - 1; // 0-based
+  if (forward) {
+    // 找本月节或下月节中，生日之后的第一个
+    const thisJie = getJieDate(data.year, bm);
+    if (data.day < JIE_DAY[bm]) {
+      jie = thisJie;
+    } else {
+      const nm = (bm + 1) % 12;
+      jie = getJieDate(nm === 0 ? data.year + 1 : data.year, nm);
+    }
+  } else {
+    // 找本月节或上月节中，生日之前的第一个
+    const thisJie = getJieDate(data.year, bm);
+    if (data.day >= JIE_DAY[bm]) {
+      jie = thisJie;
+    } else {
+      const pm = (bm - 1 + 12) % 12;
+      jie = getJieDate(pm === 11 ? data.year - 1 : data.year, pm);
+    }
+  }
+  const daysDiff = Math.abs(jie - birth) / 86400000;
+  const startAge = Math.max(1, Math.round(daysDiff / 3));
+
+  // 当前实际年龄（精确到天）
+  const today = new Date();
+  const ageNow = (today - birth) / (365.25 * 86400000);
+
   const results = [];
   for (let i = 0; i < 5; i++) {
-    const startAge = 8 + i * 10;
-    const endAge = startAge + 9;
-    const si = (pillars[1].si + (data.gender === 'male' ? 1 : -1) * (i + 1) * 2 + 100) % 10;
-    const bi = (pillars[1].bi + (data.gender === 'male' ? 1 : -1) * (i + 1) * 2 + 120) % 12;
-    const startYear = data.year + startAge;
-    const isCurrent = age >= startAge && age <= endAge;
-    results.push({ stem: STEMS[si], branch: BRANCHES[bi], startAge, endAge, startYear, isCurrent, si, bi });
+    const dAge = startAge + i * 10;
+    const eAge = dAge + 9;
+    // 每步大运干支从月柱顺/逆推进 1 位
+    const si = ((pillars[1].si + dir * (i + 1)) % 10 + 10) % 10;
+    const bi = ((pillars[1].bi + dir * (i + 1)) % 12 + 12) % 12;
+    const startYear = data.year + dAge;
+    const isCurrent = ageNow >= dAge && ageNow < dAge + 10;
+    results.push({ stem: STEMS[si], branch: BRANCHES[bi], startAge: dAge, endAge: eAge, startYear, isCurrent, si, bi });
   }
   return results;
 }
@@ -1933,15 +1971,6 @@ function buildShared(seed, pillars) {
 
 function renderWealth(data, pillars, rand, shared) {
   const wt = pick(WEALTH_TEXTS, rand);
-  const dominant = Object.entries({
-    '木':0,'火':0,'土':0,'金':0,'水':0,
-    ...['木','木','火','火','土','土','金','金','水','水'].reduce((a,e,i)=>{
-      const si = pillars[Math.floor(i/2)]?.si ?? 0;
-      return a;
-    }, {})
-  }).sort((a,b)=>b[1]-a[1])[0]?.[0] || pick(['木','火','土','金','水'], rand);
-
-  // 直接使用 shared 中已计算的主导五行和贵人数据，避免重复计算
   const domElem = shared.domElem;
   const wDir = WEALTH_DIRECTION[domElem];
   const wItems = WEALTH_ITEMS[domElem];
