@@ -1637,20 +1637,17 @@ function liuyaoCast(baseSeed) {
 // ============================================================
 //  渲染函数（大幅扩充）
 // ============================================================
-function renderBazi(data, pillars, elemCnt, rand) {
+function renderBazi(data, pillars, elemCnt, rand, shared) {
   const maxE = Math.max(...Object.values(elemCnt));
   const dominant = Object.entries(elemCnt).sort((a,b)=>b[1]-a[1])[0][0];
   const weak = Object.entries(elemCnt).sort((a,b)=>a[1]-b[1])[0][0];
   const elemCSSMap = {'木':'wood','火':'fire','土':'earth','金':'metal','水':'water'};
 
-  // 格局
-  const geju = pick(GEJU_NAMES, rand);
-  // 用神
-  const yongshenElem = pick(['木','火','土','金','水'], rand);
-  // 日主
+  // 格局/用神/强弱：从 buildShared 推导，不随机
+  const geju = shared.geju;
+  const yongshenElem = shared.yongShenElem;
   const rizhu = RIZHU_CHAR[pillars[2].stem];
-  // 强弱
-  const qiangRuo = pick(['身强','身弱','身中和'], rand);
+  const qiangRuo = shared.qiangRuo;
 
   const strengthDesc = {
     '木':'五行木气旺盛，主仁慈好学，富有生命力与创造力，具备天生的教育与医疗天赋，适合绿色生态、文化教育、医疗健康等行业深耕发展。',
@@ -1770,7 +1767,7 @@ function renderBazi(data, pillars, elemCnt, rand) {
   `;
 }
 
-function renderFace(data, pillars, rand) {
+function renderFace(data, pillars, rand, shared) {
   const faceSet = pick(FACE_TEXTS[data.gender], rand);
   const palmSet = pick(PALM_TEXTS, rand);
   const moleText = pick(MOLE_TEXTS, rand);
@@ -1793,9 +1790,17 @@ function renderFace(data, pillars, rand) {
     '命主印堂发亮，面部光泽均匀，主贵人运旺盛，近期将有贵人主动提携，带来意想不到的好机遇。',
   ];
 
-  const characterDesc = data.gender === 'male'
-    ? `命主男性阳刚之气充足，外表${pick(['端正稳重','英气勃发','温文儒雅','沉着内敛'], rand)}，内心${pick(['坚韧果敢','志向远大','仁厚善良','智慧超群'], rand)}。凡事主动进取，独立自强，事业心旺盛，遇挫折能迅速振作，愈挫愈勇。人生关键贵人往往以${pick(['上级领导','恩师长辈','商业伙伴','异性好友'], rand)}的形式出现，把握此类缘分，命运将大为改观。`
-    : `命主女性阴柔中透坚韧，外表${pick(['端庄秀丽','温婉大方','清秀灵动','雅致从容'], rand)}，内心${pick(['坚韧执着','温柔博爱','聪慧敏锐','乐观开朗'], rand)}。处事细腻周到，极具亲和力与同理心，同时心志坚定不轻言放弃。人生关键贵人往往以${pick(['职场上司','闺蜜至交','伴侣家人','陌生人意外之缘'], rand)}的形式降临，把握此类机缘，命运将迎来转折。`;
+  const characterDesc = (() => {
+    const ft = DAYMASTER_FACE_TRAITS[shared.dayMasterElem][data.gender];
+    const dp = DAYMASTER_PROFILE[shared.dayMasterElem];
+    const guirenForms = data.gender === 'male'
+      ? ['上级领导','恩师长辈','商业伙伴','异性贵人']
+      : ['职场上司','闺蜜至交','伴侣家人','意外之缘'];
+    const guiren = pick(guirenForms, rand);
+    return data.gender === 'male'
+      ? `命主男性${ft}，内心${dp.traits}。凡事主动进取，独立自强，事业心旺盛，遇挫折能迅速振作，愈挫愈勇。人生关键贵人往往以${guiren}的形式出现，把握此类缘分，命运将大为改观。`
+      : `命主女性${ft}，内心${dp.traits}。处事细腻周到，极具亲和力与同理心，同时心志坚定不轻言放弃。人生关键贵人往往以${guiren}的形式降临，把握此类机缘，命运将迎来转折。`;
+  })();
 
   return `
     <div class="analysis-card">
@@ -1843,7 +1848,7 @@ function renderFace(data, pillars, rand) {
   `;
 }
 
-function renderFengshui(data, pillars, elemCnt, rand) {
+function renderFengshui(data, pillars, elemCnt, rand, shared) {
   const dominant = Object.entries(elemCnt).sort((a,b)=>b[1]-a[1])[0][0];
   const tip = FENGSHUI_TIPS[dominant];
 
@@ -1863,7 +1868,7 @@ function renderFengshui(data, pillars, elemCnt, rand) {
       <div class="luck ${luckClass(d.lu)}">${d.lu}</div>
     </div>`).join('');
 
-  const caiwei = pick(['东南角','南方财位','西北贵人位','正北方'], rand);
+  const caiwei = ELEM_CAIWEI[shared.caiXingElem];
 
   return `
     <div class="analysis-card">
@@ -1927,6 +1932,67 @@ function renderFengshui(data, pillars, elemCnt, rand) {
   `;
 }
 
+// ── 五行十神推导表 ──────────────────────────────
+const ELEM_CAI = {木:'土',火:'金',土:'水',金:'木',水:'火'}; // 我克者为财
+const ELEM_GUAN = {木:'金',火:'水',土:'木',金:'火',水:'土'}; // 克我者为官杀
+const ELEM_YIN  = {木:'水',火:'木',土:'火',金:'土',水:'金'}; // 生我者为印
+const ELEM_SHI  = {木:'火',火:'土',土:'金',金:'水',水:'木'}; // 我生者为食伤
+
+// 各五行吉数/吉色（以用神五行为准）
+const ELEM_LUCKY_NUM   = {木:'3与8',火:'2与7',土:'5与0',金:'4与9',水:'1与6'};
+const ELEM_LUCKY_COLOR = {木:'绿色与青色',火:'红色与紫色',土:'黄色与棕色',金:'白色与银色',水:'黑色与深蓝'};
+
+// 财位方向（以财星五行为准）
+const ELEM_CAIWEI = {木:'东方财位',火:'南方财位',土:'中宫财位',金:'西方财位',水:'北方财位'};
+
+// 日主五行 → 命格特质、适合行业、工作风格、领导风格、进财方式
+const DAYMASTER_PROFILE = {
+  木: {
+    traits:   '仁慈善良、富有同情心，思维灵活创新，执行力强，有天生的教化与扶持他人之心',
+    careers:  ['教育文化','医疗健康','设计创意','环保生态','传媒出版'],
+    workStyle:'创意独立型，独当一面效率最高',
+    leaderType:'服务型领导：以成就团队为己任，深受下属爱戴',
+    wealthMethod:'以创意与专业知识积累财富，积少成多的定期投资与复利积累',
+  },
+  火: {
+    traits:   '热情奔放、领导魅力出众，行动力十足，直觉敏锐，人缘极佳',
+    careers:  ['金融投资','演艺娱乐','餐饮食品','科技创新','能源化工'],
+    workStyle:'魅力领导型，在前台与创业中激发最大潜能',
+    leaderType:'魅力型领导：以感召力与激情带动团队',
+    wealthMethod:'善用社交人脉积累财富，偏财机遇丰富，善用资金杠杆的进取型配置',
+  },
+  土: {
+    traits:   '稳重踏实、信誉卓著，包容性强，善于协调各方，是天生的守业能手',
+    careers:  ['房地产','建筑工程','农业食品','物流仓储','中介服务'],
+    workStyle:'管理统筹型，擅长协调资源，稳健推进目标',
+    leaderType:'战略型领导：善于制定大方向，统筹全局，高瞻远瞩',
+    wealthMethod:'以实业为根基的稳健价值增值，重积累轻冒进',
+  },
+  金: {
+    traits:   '果断刚毅、正义感强，执行力出色，做事雷厉风行，讲原则重承诺',
+    careers:  ['法律司法','军警安防','金融证券','制造工程','IT与科技'],
+    workStyle:'专业精英型，以深厚专业知识赢得信任与成果',
+    leaderType:'专业型领导：以深厚专业知识赢得信任',
+    wealthMethod:'以专业技能与勤奋进取积累财富，稳中求进，厚积薄发',
+  },
+  水: {
+    traits:   '智慧灵活、洞察力超群，适应力强，善于整合信息资源，宏观思维出色',
+    careers:  ['贸易外贸','信息咨询','传媒外交','旅游服务','金融理财'],
+    workStyle:'策略智囊型，思维灵活，擅长分析规划与幕后推动',
+    leaderType:'战略型领导：善于制定大方向，善用信息资源统揽全局',
+    wealthMethod:'以信息与渠道资源变现，多元化被动收入构建财务自由体系',
+  },
+};
+
+// 日主五行 → 面相气色描述
+const DAYMASTER_FACE_TRAITS = {
+  木: { male:'外表清秀挺拔，眉清目秀，气质文雅，眼神中透着仁厚与睿智', female:'外表清秀灵动，眉眼如画，气质温婉内敛，神情中透着聪慧与善意' },
+  火: { male:'外表英气勃发，目光炯炯有神，面色红润，气场强大令人印象深刻', female:'外表明艳动人，眼神明亮热情，面色有光彩，气质活泼而有感召力' },
+  土: { male:'外表稳重大气，面相方正厚实，给人以可靠安全之感，鼻梁挺秀', female:'外表端庄秀雅，面色均匀温润，气质沉稳从容，眉眼间透着踏实之气' },
+  金: { male:'外表英俊刚毅，轮廓分明，颧骨清晰，眼神坚定有力，气宇不凡', female:'外表清丽端正，五官立体分明，气质干练优雅，目光清澈而有主见' },
+  水: { male:'外表俊逸洒脱，面色白皙润泽，眼神深邃而富有智慧，气质从容飘逸', female:'外表温柔婉约，皮肤细腻光洁，眼神灵动而深邃，气质如水般柔而有韧' },
+};
+
 // 预计算所有跨模块共享数据，保证各模块数据不矛盾
 function buildShared(seed, pillars) {
   const rand = seededRand(seed + 997);
@@ -1935,6 +2001,38 @@ function buildShared(seed, pillars) {
   const elemCnt = { '木':0,'火':0,'土':0,'金':0,'水':0 };
   pillars.forEach(p => { elemCnt[STEM_ELEM[p.si]]++; elemCnt[BRANCH_ELEM[p.bi]]++; });
   const domElem = Object.entries(elemCnt).sort((a,b) => b[1]-a[1])[0][0];
+
+  // ── 日主推导 ──────────────────────────────────
+  const dayMasterElem = STEM_ELEM[pillars[2].si];
+  const caiXingElem   = ELEM_CAI[dayMasterElem];  // 财星
+  const guanXingElem  = ELEM_GUAN[dayMasterElem]; // 官杀
+  const yinXingElem   = ELEM_YIN[dayMasterElem];  // 印星
+  const shiShangElem  = ELEM_SHI[dayMasterElem];  // 食伤
+
+  // 身强/弱：统计八字中与日主相同或生日主的字数
+  let supportCount = 0;
+  pillars.forEach(p => {
+    if (STEM_ELEM[p.si]  === dayMasterElem || STEM_ELEM[p.si]  === yinXingElem) supportCount++;
+    if (BRANCH_ELEM[p.bi] === dayMasterElem || BRANCH_ELEM[p.bi] === yinXingElem) supportCount++;
+  });
+  const dayMasterStrong = supportCount >= 3;
+  const qiangRuo = dayMasterStrong ? '身强' : (supportCount === 2 ? '身中和' : '身弱');
+  // 用神：身强用财官（泄耗），身弱用印比（扶助）
+  const yongShenElem = dayMasterStrong ? caiXingElem : yinXingElem;
+
+  // 格局：以月支五行与日主关系推导
+  const monthElem = BRANCH_ELEM[pillars[1].bi];
+  const dayYang   = pillars[2].si % 2 === 0;
+  const mthYang   = pillars[1].bi  % 2 === 0;
+  const samePol   = dayYang === mthYang; // 同阴阳为偏，异阴阳为正
+  let geju;
+  if      (monthElem === dayMasterElem) geju = samePol ? '比肩格' : '劫财格';
+  else if (monthElem === yinXingElem)   geju = samePol ? '偏印格' : '正印格';
+  else if (monthElem === shiShangElem)  geju = samePol ? '食神格' : '伤官格';
+  else if (monthElem === caiXingElem)   geju = samePol ? '偏财格' : '正财格';
+  else if (monthElem === guanXingElem)  geju = samePol ? '七杀格' : '正官格';
+  else geju = '杂气格';
+
   const wGuiren = WEALTH_GUIREN[domElem];
   // 贵人属相文字（财运/事业模块统一）
   const benefactorZodiac = wGuiren.shuxiang.map(s => s.split('（')[0].replace('属','')).join('、');
@@ -1966,7 +2064,8 @@ function buildShared(seed, pillars) {
     yearStars[y] = Math.floor(rand() * 3) + 3;
   }
 
-  return { domElem, wGuiren, benefactorZodiac, wealthMonthStars, bestWealthMonths, careerMonthStars, bestCareerMonths, yearStars };
+  return { domElem, wGuiren, benefactorZodiac, wealthMonthStars, bestWealthMonths, careerMonthStars, bestCareerMonths, yearStars,
+           dayMasterElem, caiXingElem, guanXingElem, yinXingElem, dayMasterStrong, qiangRuo, yongShenElem, geju };
 }
 
 function renderWealth(data, pillars, rand, shared) {
@@ -2006,9 +2105,9 @@ function renderWealth(data, pillars, rand, shared) {
   }).join('');
 
   const wealthPeak = pick(['35-42岁','38-45岁','32-40岁','40-50岁','42-48岁'], rand);
-  const wealthMethod = pick(['积少成多的定期投资与复利积累','以实业为根基的稳健价值增值','善用资金杠杆的进取型资产配置','以知识与人脉变现的轻资产模式','多元化被动收入构建财务自由体系'], rand);
-  const wealthNum = pick(['1与6','2与7','3与8','4与9','5与0'], rand);
-  const wealthColor = pick(['金色与黄色','红色与紫色','绿色与蓝色','白色与银色','黑色与深蓝'], rand);
+  const wealthMethod = DAYMASTER_PROFILE[shared.dayMasterElem].wealthMethod;
+  const wealthNum    = ELEM_LUCKY_NUM[shared.caiXingElem];
+  const wealthColor  = ELEM_LUCKY_COLOR[shared.yongShenElem];
 
   const itemsHtml = wItems.items.map(it => `
     <div class="analysis-card" style="margin-bottom:12px">
@@ -2159,10 +2258,9 @@ function renderCareer(data, pillars, rand, shared) {
     { name:'领导能力', val: score(rand,70,28) },
     { name:'专业技能', val: score(rand,73,24) },
   ];
-  const careers = ['人工智能与大数据','金融投资与财富管理','医疗健康与生物科技','教育培训与在线学习','法律顾问与合规','文化传媒与内容创作','政府机关与公共事业','建筑地产与城市规划','跨境贸易与供应链','艺术设计与品牌策划','能源与新材料','心理咨询与社会工作'];
-
-  const workStyle = pick(['独立自主型，独当一面效率最高','团队协作型，在优秀团队中激发最大潜能','管理统筹型，擅长协调资源带领团队','专家顾问型，以专业知识为核心竞争力'], rand);
-  const leaderType = pick(['魅力型领导：以感召力与激情带动团队','专业型领导：以深厚专业知识赢得信任','战略型领导：善于制定大方向，高瞻远瞩','服务型领导：以成就团队为己任，深受下属爱戴'], rand);
+  const careers    = DAYMASTER_PROFILE[shared.dayMasterElem].careers;
+  const workStyle  = DAYMASTER_PROFILE[shared.dayMasterElem].workStyle;
+  const leaderType = DAYMASTER_PROFILE[shared.dayMasterElem].leaderType;
 
   const keyMonths = shared.bestCareerMonths;
 
@@ -2188,11 +2286,11 @@ function renderCareer(data, pillars, rand, shared) {
       <div class="tip-grid">
         <div class="tip-item">
           <div class="tip-label">✦ 最佳行业方向</div>
-          <div class="tip-value">${pick(careers,rand)}</div>
+          <div class="tip-value">${careers[0]}</div>
         </div>
         <div class="tip-item">
           <div class="tip-label">✦ 次选行业方向</div>
-          <div class="tip-value">${pick(careers,rand)}</div>
+          <div class="tip-value">${careers[1]}</div>
         </div>
         <div class="tip-item">
           <div class="tip-label">✦ 工作方式偏好</div>
@@ -2253,7 +2351,7 @@ function getCompatZodiac(yearBranch) {
   return { zodiac, wuxing: group.wuxing };
 }
 
-function renderLove(data, pillars, rand) {
+function renderLove(data, pillars, rand, shared) {
   const lt = pick(LOVE_TEXTS[data.gender], rand);
   const compat = getCompatZodiac(pillars[0].bi);
   const loveScores = [
@@ -2332,7 +2430,7 @@ function renderLove(data, pillars, rand) {
   `;
 }
 
-function renderHealth(data, pillars, elemCnt, rand) {
+function renderHealth(data, pillars, elemCnt, rand, shared) {
   const dominant = Object.entries(elemCnt).sort((a,b)=>b[1]-a[1])[0][0];
   const ht = HEALTH_TEXTS[dominant];
 
@@ -2536,14 +2634,14 @@ function calculate() {
     // 预计算共享数据，确保各模块月运/年运数据完全一致，避免矛盾
     const shared = buildShared(seed, pillars);
 
-    document.getElementById('tab-bazi').innerHTML = renderBazi(data, pillars, elemCnt, r1);
-    document.getElementById('tab-face').innerHTML = renderFace(data, pillars, r2);
-    document.getElementById('tab-fengshui').innerHTML = renderFengshui(data, pillars, elemCnt, r3);
-    document.getElementById('tab-wealth').innerHTML = renderWealth(data, pillars, r4, shared);
-    document.getElementById('tab-career').innerHTML = renderCareer(data, pillars, r5, shared);
-    document.getElementById('tab-love').innerHTML = renderLove(data, pillars, r6);
-    document.getElementById('tab-health').innerHTML = renderHealth(data, pillars, elemCnt, r7);
-    document.getElementById('tab-yearly').innerHTML = renderYearly(data, pillars, r8, shared);
+    document.getElementById('tab-bazi').innerHTML     = renderBazi(data, pillars, elemCnt, r1, shared);
+    document.getElementById('tab-face').innerHTML     = renderFace(data, pillars, r2, shared);
+    document.getElementById('tab-fengshui').innerHTML = renderFengshui(data, pillars, elemCnt, r3, shared);
+    document.getElementById('tab-wealth').innerHTML   = renderWealth(data, pillars, r4, shared);
+    document.getElementById('tab-career').innerHTML   = renderCareer(data, pillars, r5, shared);
+    document.getElementById('tab-love').innerHTML     = renderLove(data, pillars, r6, shared);
+    document.getElementById('tab-health').innerHTML   = renderHealth(data, pillars, elemCnt, r7, shared);
+    document.getElementById('tab-yearly').innerHTML   = renderYearly(data, pillars, r8, shared);
     document.getElementById('tab-liuyao').innerHTML = renderLiuyao(data, pillars);
 
     document.getElementById('results').classList.add('show');
