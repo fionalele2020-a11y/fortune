@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>改命记实录 · 玄机命理馆</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dark: #8a6f2e;
+    --red: #9b1c1c;
+    --red-light: #c0392b;
+    --bg: #06060e;
+    --bg2: #0e0e1a;
+    --bg3: #16162a;
+    --bg4: #1e1e30;
+    --text: #e8d5a3;
+    --text-dim: #a89060;
+    --border: rgba(201,168,76,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Serif SC', 'STSong', 'SimSun', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === 星空背景 === */
+  .starfield {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+  }
+  .starfield canvas { width: 100%; height: 100%; }
+
+  /* === 纹样装饰 === */
+  .pattern-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(201,168,76,0.02) 60px, rgba(201,168,76,0.02) 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(201,168,76,0.02) 60px, rgba(201,168,76,0.02) 61px);
+    pointer-events: none; z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  /* === 页头 === */
+  header {
+    text-align: center;
+    padding: 60px 20px 40px;
+    position: relative;
+  }
+  .header-deco {
+    display: flex; align-items: center; justify-content: center;
+    gap: 20px; margin-bottom: 20px;
+  }
+  .header-deco .line {
+    flex: 1; max-width: 120px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+  .header-deco .line.right { background: linear-gradient(90deg, var(--gold), transparent); }
+  .header-deco .yin-yang {
+    font-size: 36px; animation: spin 20s linear infinite;
+    filter: drop-shadow(0 0 10px var(--gold));
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  header h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.15em;
+    text-shadow: none;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  header h1::after {
+    content: '改命记实录·玄机命理馆';
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    color: var(--gold); opacity: 0.06;
+    font-size: 1.5em; white-space: nowrap; pointer-events: none;
+  }
+  header .subtitle {
+    color: var(--text-dim); font-size: 0.95rem; letter-spacing: 0.3em;
+  }
+
+  /* === 八卦装饰 === */
+  .bagua-row {
+    display: flex; justify-content: center; gap: 8px; margin-top: 16px;
+    font-size: 1.5rem; color: var(--gold-dark); opacity: 0.6;
+    animation: flicker 4s ease-in-out infinite;
+  }
+  @keyframes flicker {
+    0%,100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
+  }
+
+  /* === 输入卡片 === */
+  .input-card {
+    background: linear-gradient(135deg, var(--bg2), var(--bg3));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 44px;
+    margin: 0 auto 40px;
+    max-width: 700px;
+    box-shadow: 0 0 60px rgba(201,168,76,0.08), 0 20px 60px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .input-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .input-card::after {
+    content: '☯';
+    position: absolute; bottom: -20px; right: -10px;
+    font-size: 120px; color: var(--gold); opacity: 0.03;
+    pointer-events: none;
+  }
+
+  .card-title {
+    text-align: center; font-size: 1.1rem; letter-spacing: 0.3em;
+    color: var(--gold); margin-bottom: 30px;
+    display: flex; align-items: center; gap: 12px; justify-content: center;
+  }
+  .card-title::before, .card-title::after {
+    content: '◆'; font-size: 0.5rem; opacity: 0.7;
+  }
+
+  .form-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 0.82rem; color: var(--gold); letter-spacing: 0.15em;
+  }
+  input, select {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    color: var(--text); font-family: inherit; font-size: 0.95rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    outline: none; width: 100%;
+  }
+  input:focus, select:focus {
+    border-color: var(--gold-dark);
+    box-shadow: 0 0 12px rgba(201,168,76,0.15);
+  }
+  select option { background: var(--bg3); }
+
+  .submit-btn {
+    display: block; width: 100%; margin-top: 28px;
+    padding: 14px;
+    background: linear-gradient(135deg, #8a6f2e, var(--gold), #8a6f2e);
+    background-size: 200% 100%;
+    border: none; border-radius: 8px;
+    color: var(--bg); font-family: inherit; font-size: 1.05rem;
+    font-weight: 700; letter-spacing: 0.3em; cursor: pointer;
+    transition: background-position 0.4s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+  }
+  .submit-btn:hover {
+    background-position: right;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201,168,76,0.4);
+  }
+  .submit-btn:active { transform: translateY(0); }
+
+  /* === 加载动画 === */
+  .loading {
+    display: none; text-align: center; padding: 60px 20px;
+  }
+  .loading.show { display: block; }
+  .loading-icon {
+    font-size: 4rem; animation: spin 2s linear infinite;
+    display: block; margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px var(--gold));
+  }
+  .loading p { color: var(--text-dim); letter-spacing: 0.2em; }
+
+  /* === 结果区域 === */
+  .results { display: none; }
+  .results.show { display: block; }
+
+  .result-header {
+    text-align: center; margin-bottom: 40px;
+    padding: 30px;
+    background: linear-gradient(135deg, var(--bg2), var(--bg3));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    position: relative; overflow: hidden;
+  }
+  .result-header::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--red), var(--gold), transparent);
+  }
+  .result-name {
+    font-size: 2rem; color: var(--gold-light);
+    letter-spacing: 0.2em; margin-bottom: 8px;
+  }
+  .result-meta {
+    color: var(--text-dim); font-size: 0.85rem; letter-spacing: 0.15em;
+    line-height: 2;
+  }
+  .bazi-display {
+    display: flex; justify-content: center; gap: 16px;
+    margin: 20px 0; flex-wrap: wrap;
+  }
+  .pillar {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px; text-align: center;
+    min-width: 72px;
+  }
+  .pillar-label { font-size: 0.7rem; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 8px; }
+  .pillar-stem { font-size: 1.8rem; line-height: 1; margin-bottom: 4px; }
+  .pillar-branch { font-size: 1.8rem; line-height: 1; }
+  .element-fire { color: #e85c30; }
+  .element-wood { color: #4caf50; }
+  .element-water { color: #4fc3f7; }
+  .element-metal { color: #bdbdbd; }
+  .element-earth { color: #c9a84c; }
+
+  /* === 模块标签页 === */
+  .tabs {
+    display: flex; gap: 8px; margin-bottom: 24px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .tab-btn {
+    padding: 8px 18px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text-dim); font-family: inherit;
+    font-size: 0.85rem; cursor: pointer; letter-spacing: 0.1em;
+    transition: all 0.3s;
+  }
+  .tab-btn:hover { border-color: var(--gold-dark); color: var(--text); }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--bg3), var(--bg4));
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 12px rgba(201,168,76,0.15);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* === 分析卡片 === */
+  .analysis-card {
+    background: linear-gradient(135deg, var(--bg2), var(--bg3));
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 30px 36px; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .analysis-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .analysis-card-title {
+    font-size: 1rem; color: var(--gold); letter-spacing: 0.2em;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .analysis-card-title .icon { font-size: 1.3rem; }
+
+  .analysis-card p {
+    color: var(--text); line-height: 2; font-size: 0.92rem;
+    margin-bottom: 12px;
+  }
+  .analysis-card p:last-child { margin-bottom: 0; }
+
+  /* === 五行图 === */
+  .wuxing-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 10px; margin: 16px 0;
+  }
+  .wuxing-item {
+    text-align: center; padding: 14px 8px;
+    border-radius: 10px; border: 1px solid;
+  }
+  .wuxing-item .wuxing-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+  .wuxing-item .wuxing-count { font-size: 0.75rem; opacity: 0.8; }
+  .wuxing-bar-wrap { margin-top: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; height: 4px; overflow: hidden; }
+  .wuxing-bar { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+  .wuxing-fire .wuxing-item { border-color: rgba(232,92,48,0.4); background: rgba(232,92,48,0.08); color: #e85c30; }
+  .wuxing-fire .wuxing-bar { background: #e85c30; }
+  .wuxing-wood .wuxing-item { border-color: rgba(76,175,80,0.4); background: rgba(76,175,80,0.08); color: #4caf50; }
+  .wuxing-wood .wuxing-bar { background: #4caf50; }
+  .wuxing-water .wuxing-item { border-color: rgba(79,195,247,0.4); background: rgba(79,195,247,0.08); color: #4fc3f7; }
+  .wuxing-water .wuxing-bar { background: #4fc3f7; }
+  .wuxing-metal .wuxing-item { border-color: rgba(189,189,189,0.4); background: rgba(189,189,189,0.08); color: #bdbdbd; }
+  .wuxing-metal .wuxing-bar { background: #bdbdbd; }
+  .wuxing-earth .wuxing-item { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.08); color: #c9a84c; }
+  .wuxing-earth .wuxing-bar { background: #c9a84c; }
+
+  /* === 运势评分 === */
+  .score-row {
+    display: flex; align-items: center; gap: 14px; margin: 10px 0;
+  }
+  .score-label { min-width: 60px; font-size: 0.85rem; color: var(--text-dim); }
+  .score-bar-wrap {
+    flex: 1; background: rgba(0,0,0,0.4); border-radius: 4px; height: 8px;
+    overflow: hidden;
+  }
+  .score-bar {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+    transition: width 1.2s ease;
+  }
+  .score-val { min-width: 40px; text-align: right; font-size: 0.85rem; color: var(--gold); }
+
+  /* === 年运表格 === */
+  .year-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+  .year-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px; text-align: center;
+    transition: border-color 0.3s;
+  }
+  .year-card:hover { border-color: var(--gold-dark); }
+  .year-card .year-num { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px; }
+  .year-card .year-gz { font-size: 1rem; color: var(--gold); margin-bottom: 6px; }
+  .year-card .year-stars { color: var(--red-light); font-size: 0.9rem; }
+
+  /* === 风水方位 === */
+  .compass {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 6px; max-width: 300px; margin: 0 auto 20px;
+  }
+  .compass-cell {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 8px; text-align: center;
+    font-size: 0.82rem;
+  }
+  .compass-cell.center {
+    background: linear-gradient(135deg, var(--bg3), var(--bg4));
+    border-color: var(--gold-dark);
+    color: var(--gold);
+  }
+  .compass-cell .dir { font-size: 0.7rem; color: var(--text-dim); }
+  .compass-cell .luck { font-size: 1.1rem; }
+  .compass-cell .good { color: #4caf50; }
+  .compass-cell .bad { color: var(--red-light); }
+  .compass-cell .neutral { color: var(--text-dim); }
+
+  /* === 吉祥提示 === */
+  .tip-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0;
+  }
+  .tip-item {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px;
+  }
+  .tip-item .tip-label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 8px; letter-spacing: 0.1em; }
+  .tip-item .tip-value { font-size: 0.9rem; color: var(--gold); }
+
+  /* === 签文 === */
+  .qianwen {
+    text-align: center; padding: 24px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; margin: 16px 0;
+    font-size: 1.05rem; line-height: 2.4;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+  .qianwen strong { color: var(--gold); font-style: normal; display: block; margin-bottom: 8px; font-size: 0.8rem; letter-spacing: 0.3em; }
+
+  /* === 分割线 === */
+  .divider {
+    text-align: center; margin: 20px 0;
+    color: var(--gold-dark); font-size: 0.9rem; letter-spacing: 0.5em;
+  }
+
+  /* === 页脚 === */
+  footer {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-dim); font-size: 0.8rem;
+    border-top: 1px solid var(--border); margin-top: 60px;
+    letter-spacing: 0.15em; line-height: 2;
+  }
+
+  /* === 响应式 === */
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .input-card { padding: 28px 20px; }
+    .analysis-card { padding: 22px 18px; }
+    .wuxing-grid { grid-template-columns: repeat(5, 1fr); }
+    .tip-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="starfield"><canvas id="starCanvas"></canvas></div>
+<div class="pattern-overlay"></div>
+
+<div class="container">
+
+  <!-- 页头 -->
+  <header>
+    <div class="header-deco">
+      <div class="line"></div>
+      <div class="yin-yang">☯</div>
+      <div class="line right"></div>
+    </div>
+    <h1>玄机命理馆</h1>
+    <p class="subtitle">· 改命记实录 · 天命玄机 · 道法自然 ·</p>
+    <div class="bagua-row">
+      <span>☰</span><span>☱</span><span>☲</span><span>☳</span>
+      <span>☴</span><span>☵</span><span>☶</span><span>☷</span>
+    </div>
+  </header>
+
+  <!-- 输入表单 -->
+  <div class="input-card" id="inputCard">
+    <div class="card-title">请输入命主信息</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>姓名</label>
+        <input type="text" id="name" placeholder="请输入您的姓名" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label>性别</label>
+        <select id="gender">
+          <option value="male">男</option>
+          <option value="female">女</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>出生年月日</label>
+        <input type="date" id="birthDate" value="1990-01-01">
+      </div>
+      <div class="form-group">
+        <label>出生时辰</label>
+        <select id="birthHour">
+          <option value="23">子时（23:00-01:00）</option>
+          <option value="1">丑时（01:00-03:00）</option>
+          <option value="3">寅时（03:00-05:00）</option>
+          <option value="5">卯时（05:00-07:00）</option>
+          <option value="7">辰时（07:00-09:00）</option>
+          <option value="9">巳时（09:00-11:00）</option>
+          <option value="11">午时（11:00-13:00）</option>
+          <option value="13">未时（13:00-15:00）</option>
+          <option value="15">申时（15:00-17:00）</option>
+          <option value="17">酉时（17:00-19:00）</option>
+          <option value="19">戌时（19:00-21:00）</option>
+          <option value="21">亥时（21:00-23:00）</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>出生地（选填）</label>
+        <input type="text" id="birthPlace" placeholder="如：北京市、上海市…">
+      </div>
+    </div>
+    <button class="submit-btn" onclick="calculate()">✦ 起卦排盘 · 解析命局 ✦</button>
+  </div>
+
+  <!-- 加载动画 -->
+  <div class="loading" id="loading">
+    <span class="loading-icon">☯</span>
+    <p>天机运转，正在推演命局……</p>
+  </div>
+
+  <!-- 结果 -->
+  <div class="results" id="results">
+
+    <div class="result-header" id="resultHeader"></div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('bazi')">☰ 八字命盘</button>
+      <button class="tab-btn" onclick="switchTab('face')">◎ 面相命格</button>
+      <button class="tab-btn" onclick="switchTab('fengshui')">⬡ 风水宅运</button>
+      <button class="tab-btn" onclick="switchTab('wealth')">◈ 财运详解</button>
+      <button class="tab-btn" onclick="switchTab('career')">⬟ 事业运势</button>
+      <button class="tab-btn" onclick="switchTab('love')">♡ 感情婚姻</button>
+      <button class="tab-btn" onclick="switchTab('health')">✦ 健康运势</button>
+      <button class="tab-btn" onclick="switchTab('yearly')">◉ 年运走势</button>
+    </div>
+
+    <div id="tab-bazi" class="tab-panel active"></div>
+    <div id="tab-face" class="tab-panel"></div>
+    <div id="tab-fengshui" class="tab-panel"></div>
+    <div id="tab-wealth" class="tab-panel"></div>
+    <div id="tab-career" class="tab-panel"></div>
+    <div id="tab-love" class="tab-panel"></div>
+    <div id="tab-health" class="tab-panel"></div>
+    <div id="tab-yearly" class="tab-panel"></div>
+
+    <div style="text-align:center; margin-top:40px;">
+      <button class="submit-btn" style="max-width:300px; display:inline-block;" onclick="reset()">
+        ✦ 重新起卦
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div>☯ 改命记实录 · 玄机命理馆 ☯</div>
+  <div>命理分析仅供参考娱乐，人生命运终由自身把握</div>
+  <div>道可道，非常道；名可名，非常名</div>
+</footer>
+
+<script>
+// ============================================================
+//  数据常量
+// ============================================================
+const STEMS = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const ZODIAC = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+const STEM_ELEM = ['木','木','火','火','土','土','金','金','水','水'];
+const BRANCH_ELEM = ['水','土','木','木','土','火','火','土','金','金','土','水'];
+const ELEM_COLOR = { '火':'element-fire','木':'element-wood','水':'element-water','金':'element-metal','土':'element-earth' };
+const HOUR_BRANCH = [11,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11];
+const MONTH_NAMES = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+
+// ============================================================
+//  八字计算
+// ============================================================
+function getYearPillar(year) {
+  const si = ((year - 4) % 10 + 10) % 10;
+  const bi = ((year - 4) % 12 + 12) % 12;
+  return { stem: STEMS[si], branch: BRANCHES[bi], si, bi };
+}
+
+function getMonthPillar(year, month) {
+  // 月支从寅（索引2）开始，正月=寅
+  const bi = (month + 1) % 12; // 简化：1月→2(寅)，2月→3(卯)…
+  const yearSi = ((year - 4) % 10 + 10) % 10;
+  // 月干根据年干推算：甲己年从丙寅起
+  const monthStemBase = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0][yearSi];
+  const si = (monthStemBase + (month - 1)) % 10;
+  return { stem: STEMS[si], branch: BRANCHES[bi], si, bi };
+}
+
+function getDayPillar(year, month, day) {
+  const d = new Date(year, month - 1, day);
+  const ref = new Date(1900, 0, 31); // 庚子日（甲子=0，庚子=6*10+0=60+0…简化）
+  const diff = Math.round((d - ref) / 86400000);
+  const si = ((diff % 10) + 10) % 10;
+  const bi = ((diff % 12) + 12) % 12;
+  return { stem: STEMS[si], branch: BRANCHES[bi], si, bi };
+}
+
+function getHourPillar(daySi, hour) {
+  const bi = HOUR_BRANCH[hour];
+  const hourStemBase = [0, 2, 4, 6, 8][daySi % 5];
+  const si = (hourStemBase + bi) % 10;
+  return { stem: STEMS[si], branch: BRANCHES[bi], si, bi };
+}
+
+function countElements(pillars) {
+  const cnt = { '木':0,'火':0,'土':0,'金':0,'水':0 };
+  pillars.forEach(p => {
+    cnt[STEM_ELEM[p.si]]++;
+    cnt[BRANCH_ELEM[p.bi]]++;
+  });
+  return cnt;
+}
+
+// ============================================================
+//  随机（但基于seed，保证同一输入同一结果）
+// ============================================================
+function seededRand(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
+function pick(arr, rand) { return arr[Math.floor(rand() * arr.length)]; }
+
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+
+function score(rand, base, spread) {
+  return Math.min(99, Math.max(40, Math.round(base + (rand() - 0.5) * spread)));
+}
+
+// ============================================================
+//  文本库（大幅扩充）
+// ============================================================
+
+// 格局名称
+const GEJU_NAMES = ['正官格','偏财格','食神格','伤官格','正印格','偏印格','七杀格','比肩格','劫财格','建禄格'];
+const GEJU_DESC = {
+  '正官格':'正官格为命中最贵之格，主人品端正、规则意识强，仕途顺遂，适合从事政府、法律、教育等稳定职业，一生衣食丰足，晚年有威望。',
+  '偏财格':'偏财格主财源广进，善于把握商机，具备天生的商业敏感度。此格之人外缘极好，对异性颇具吸引力，但需防财来财去，宜及时固化财富。',
+  '食神格':'食神格为最具福气之格，主衣食丰足、心宽体胖，性格温和宽容，富有创意与艺术天赋，一生少灾少难，福寿绵长。',
+  '伤官格':'伤官格之人才华横溢，思维超前，不拘一格，具有强烈的创造性与批判精神，适合艺术、科研、创业等领域，但需注意言辞不宜过激。',
+  '正印格':'正印格主学识渊博，记忆力超群，贵人频现，适合文教、学术、出版、医疗等行业，中晚年运势持续稳步上扬，声誉颇高。',
+  '偏印格':'偏印格之人思维独特，直觉灵敏，善于钻研冷门学问，颇具玄学慧根，适合研究、哲学、宗教、心理学等领域。',
+  '七杀格':'七杀格主魄力超群，有将帅之风，遇事敢于决断，执行力极强，适合军政、竞技、投资等高压行业，但需注意调节情绪。',
+  '比肩格':'比肩格之人独立自主，自尊心强，做事靠自身实力而非借助他人，中晚年凭借坚韧努力厚积薄发，事业稳中有升。',
+  '劫财格':'劫财格之人魄力十足，善于合作与资源整合，具备带动他人的感召力，合伙事业机遇多，但需防止财务往来引发纠纷。',
+  '建禄格':'建禄格为专旺格之一，主独立自强，意志力坚定，凡事靠自力更生，事业心旺盛，尤擅管理与领导，中年后运势大开。',
+};
+
+// 大运描述
+const DAYUN_DESC = [
+  '大运行至{stem}{branch}，此十年{elem}气得令，正财旺盛，事业机遇连连，宜积极进取，拓展人脉，财运与事业双丰收之象。',
+  '大运行至{stem}{branch}，印星护佑，学习运与贵人运极旺，宜进修充电、提升学历或技能，为未来十年腾飞积蓄能量。',
+  '大运行至{stem}{branch}，官星入运，仕途顺遂，职场晋升机遇明显，此十年是立功立业的黄金阶段，把握机遇可成就一番事业。',
+  '大运行至{stem}{branch}，比劫旺盛，竞争激烈，宜低调行事，专注本业，同时扩大合作圈，以抱团方式应对挑战。',
+  '大运行至{stem}{branch}，食伤生财，才华得以发挥，财运逐步好转，适合在此期间创业或从事自由职业，变现能力提升。',
+];
+
+// 用神说明
+const YONGSHEN_DESC = {
+  '木':'用神为木，宜多接触木制品与绿色植物，出行朝东或东南，家居多用原木装饰，穿青绿色服装，以顺应本命用神，增旺吉气。',
+  '火':'用神为火，宜多晒太阳，家中南方可点长明灯或摆红色摆件，穿红橙色系服装，常去热闹场所，以补充阳气，激活正能量。',
+  '土':'用神为土，宜多接地气，居住低楼层或平房有利，多吃黄色食物，佩戴黄水晶或虎眼石，常去农庄或山地，稳固根基。',
+  '金':'用神为金，宜佩戴黄金、白银饰品，家居多用金属摆件，穿白色或金色系服装，常去西方城市或高地，以增旺金气，助力运势。',
+  '水':'用神为水，宜多喝水、常近水，家中北方可摆鱼缸或流水摆件，穿黑色或深蓝色系服装，出行朝北，以润泽心智，开启智慧。',
+};
+
+// 日主性格
+const RIZHU_CHAR = {
+  '甲':'甲木日主，性格如参天大树，正直刚毅，坚持原则，具有极强的领导气质与进取心。待人真诚热忱，责任感强，重承诺、讲信义，但有时显得固执，不易妥协。',
+  '乙':'乙木日主，性情柔韧如藤蔓，外柔内刚，善于审时度势、因势利导。具有艺术气质，审美出众，人际关系处理灵活，善于在夹缝中寻找机会成就自我。',
+  '丙':'丙火日主，性格热情似骄阳，开朗大方，光明磊落，具有极强的感染力与领导魅力。慷慨助人，好出风头，喜欢被关注，是天生的演讲家与领袖人物。',
+  '丁':'丁火日主，性格如烛光温柔而持久，心思细腻，富有洞察力，内心世界丰富。善于以柔克刚，在细节处见功夫，对爱情执着专一，对朋友情深义重。',
+  '戊':'戊土日主，性格如山岳般沉稳厚重，踏实可靠，信义为先，极具包容心。处事稳健，鲜少冒险，但一旦认定目标便坚持到底，是天生的守业能手。',
+  '己':'己土日主，性格细腻温润如田土，善于滋养他人，极具亲和力与包容性。做事认真负责，注重细节，对家庭感情深厚，是理想的合作伙伴与家庭支柱。',
+  '庚':'庚金日主，性格刚直如铁，果断决绝，执行力超强，凡事讲求效率。正义感强，嫉恶如仇，敢于担当，是天生的将帅之才，但有时失于莽撞。',
+  '辛':'辛金日主，性格如玉般温润而有光泽，外表温文儒雅，内心却有一股坚韧之气。审美品位高雅，追求完美，善于精打细算，在细节处显现超群才华。',
+  '壬':'壬水日主，性格如大海般深邃广博，智慧过人，思维灵活，应变能力极强。富有哲思，善于纵观全局，包容性强，但有时流于优柔寡断，需培养决断力。',
+  '癸':'癸水日主，性格如山泉般清澈灵动，直觉敏锐，善于洞察人心。外表温和低调，实则内心坚韧，做事有条不紊，在细水长流中积聚力量，厚积薄发。',
+};
+
+// 面相文本库（大幅扩充）
+const FACE_TEXTS = {
+  male: [
+    {
+      head: '额头宽阔饱满，天庭开朗，印堂光洁无纹，主早年得父辈庇荫，少年聪颖，升学顺利，青年便能在事业上崭露头角，仕途平坦。',
+      eye: '双目炯炯有神，黑白分明，眼神坚定中带有温度，主智慧与仁慈并存。此等眼相之人，处事公正，善于识人用人，上司与同事皆乐于提携。',
+      nose: '鼻梁高挺端正，鼻头圆润丰厚，两翼适中，乃财帛宫之吉相。主中年后财运丰厚，擅长在生意往来中把握时机，财源如流水般滚滚而来。',
+      ear: '双耳轮廓分明，耳垂厚实饱满，色泽红润，是长寿与福禄之征兆。主命主一生健康平顺，晚年福报深厚，子孙孝顺，安享天伦。',
+      mouth: '嘴角微微上扬，唇色红润自然，上下唇比例匀称，主口才出众，善于演讲与交际。此相之人人缘极旺，贵人自然上门，官场与商场皆如鱼得水。',
+      chin: '下巴方圆有力，地阁饱满，主晚年根基稳固，福寿双全。此等面相之人，凡事有始有终，处事稳健，中老年后越活越通透，生活质量持续提升。',
+    },
+    {
+      head: '天庭开阔，额骨略高，发际线整齐，主思维超前，志向远大，年少便有宏图大志。此相之人往往在同龄人中脱颖而出，少年得志，前途无量。',
+      eye: '眼型修长，眼角略微上扬，目光锐利而深邃，主洞察力超群，善于看透事物本质。在谈判、决策等关键时刻，往往能一眼识破机遇，先人一步。',
+      nose: '鼻形端正，鼻翼宽大，鼻孔略收，主财库丰盈且守财有道。此相之人挣钱固然有一套，更懂得保住财富，中年以后资产稳步增值。',
+      ear: '耳郭宽厚，贴面而生，耳内轮廓清晰，主肾气充沛，精力旺盛。此相之人生命力强健，在高压工作中依然能保持良好状态，越战越勇。',
+      mouth: '口型端正，牙齿整齐洁白，说话声音洪亮有力，主信誉卓著，言出必行。此相之人无论经商还是从政，皆能以诚信赢得口碑，事业基础牢固。',
+      chin: '下颌轮廓分明，骨感适中，主意志坚定，遇难不馁。此相之人生命中纵有低谷，也能凭借内在韧劲一一化解，终将迎来属于自己的高光时刻。',
+    },
+    {
+      head: '额头宽广且圆润，皮肤光滑，印堂处隐有紫气浮现，此乃贵人命相，主一生贵气十足，逢大事必有高人指引，化险为夷。',
+      eye: '眼皮单薄，眼神内敛而专注，主心思深沉，善于谋略。此等目相之人城府较深，不轻易显山露水，往往在低调中积蓄力量，一鸣惊人。',
+      nose: '准头圆润，山根高挺，财星有气，主财运贯穿一生，正财偏财兼得。擅长利用人脉和资源变现，中年以后财富积累呈指数级增长。',
+      ear: '耳朵位置偏高，超过眉毛，乃聪明过人之征，主才思敏捷，学习能力超强，年少便能出类拔萃，在学业与职场中均有优异表现。',
+      mouth: '嘴唇厚实，人中深长，主子孙缘旺，家庭福厚。此相之人生命能量充沛，对家人付出甘之如饴，一生以家为重，晚年儿孙满堂。',
+      chin: '下巴浑圆，稍向前突，主性格积极主动，不甘平庸。此相之人总是比常人多走一步，在关键节点上敢于争先，人生际遇因此大为不同。',
+    },
+  ],
+  female: [
+    {
+      head: '额头饱满圆润，发际线整齐弧线优美，主聪慧贤淑，气质脱俗。此等额相之女性，早年学业顺遂，中年事业与家庭两相兼顾，处处游刃有余。',
+      eye: '眼睛明亮有神，眼型秀气，眼白清澈无红丝，主心地善良，心胸开阔。此相之女性，感情世界丰富细腻，对爱人体贴入微，婚后家庭和谐美满。',
+      nose: '鼻梁秀挺，鼻头圆润不过大，主家运兴旺，理财能力出众。此等鼻相之女性，持家有道，善于开源节流，家庭财务管理井井有条，生活富足安康。',
+      ear: '耳朵形状贝壳般精巧，耳垂饱满，色泽温润，主福德深厚，受长辈与贵人庇护。一生少有大坎，运势平稳中偶有惊喜，晚景尤为宁和幸福。',
+      mouth: '唇形精致饱满，唇色自然红润，人中清晰，主口才绝佳，极具说服力。此相之女性，在社交场合如鱼得水，凭借亲和魅力广结善缘，贵人不断。',
+      chin: '下巴圆润丰满，线条流畅，主晚年有福，子孙孝顺。此相之女性人生下半场越来越精彩，退休后生活质量优越，享受丰盛的天伦之乐。',
+    },
+    {
+      head: '天庭微微隆起，印堂宽阔光洁，主思维清晰，判断力出众。此相之女性往往具备超越常人的大局观，在关键决策上少走弯路，事半功倍。',
+      eye: '凤眼细长，眼尾微微上扬，眼神灵动而深邃，主魅力非凡，对异性极具吸引力。此相之女性感情路上桃花旺盛，追求者众多，姻缘质量上乘。',
+      nose: '鼻翼端庄，准头丰润有光泽，主财运与夫运俱佳。此等鼻相之女性，选择配偶眼光精准，往往能嫁得良人，夫妻共同创业财源广进，双双有成。',
+      ear: '双耳略大，轮廓分明，主肾气充足，精力旺盛。此相之女性活力充沛，即使到了中老年依然神采奕奕，养生有道，健康状况令同龄人羡慕。',
+      mouth: '嘴唇轮廓清晰，上唇略薄、下唇丰厚，主感性与理性兼备，情商极高。此相之女性处理人际关系游刃有余，朋友圈广泛，口碑绝佳。',
+      chin: '下巴微尖而有力，主个性鲜明，独立自主。此相之女性不依赖他人，有强烈的自我实现欲望，在事业上往往能闯出属于自己的一片天地。',
+    },
+    {
+      head: '额头平滑，轮廓优美，隐有富贵之气，主一生命运亨通，贵人多助。此相之女性年轻时便能展现出与众不同的气质，深受长辈器重与提携。',
+      eye: '眼睛圆润有神，双眸如秋水澄澈，主感情纯真，对感情忠诚专一。此相之女性爱情运势极佳，一旦确定伴侣便全身心投入，婚姻美满幸福。',
+      nose: '山根高挺，鼻翼丰满有力，主事业心强，财运绵长。此相之女性不甘于平凡生活，在职场上积极进取，以实力赢得尊重，财富随事业成就不断积累。',
+      ear: '耳朵紧贴头部，耳面光滑，主心思缜密，处事周全。此相之女性对细节有超强的把控能力，无论家庭还是职场事务，皆能安排得妥妥当当。',
+      mouth: '唇形丰润，嘴角微翘，主人缘绝佳，笑容令人如沐春风。此相之女性天生具备化解矛盾的能力，在家庭与社交中扮演黏合剂的角色，受众人爱戴。',
+      chin: '地阁方圆丰厚，主根基稳固，晚年衣食丰足。此相之女性人生规划性强，年轻时便为未来打好基础，中老年后生活越来越从容，心态平和愉悦。',
+    },
+  ]
+};
+
+// 手相文本库
+const PALM_TEXTS = [
+  {
+    lifeline: '生命线深长清晰，弧度饱满，从虎口延伸至腕部，主体质强健，生命力旺盛，精力充沛，即便面临巨大压力也能快速恢复，寿元绵长。',
+    headline: '智慧线笔直清晰，延伸至中指下方，主思维逻辑严密，理性思考能力超强，适合从事需要精密分析的工作，在数据、法律、工程领域表现出色。',
+    heartline: '感情线弧度优美，清晰无断裂，延伸至食指下方，主感情专一，重视伴侣感受，婚姻运势极佳，一生感情平顺，不轻易动感情但一旦爱便深沉。',
+    fateline: '命运线从腕部笔直延伸至中指，清晰有力，主事业运势强劲，人生目标清晰，中年前后事业线与财富线交汇，财运与事业双丰收。',
+  },
+  {
+    lifeline: '生命线清晰饱满，略有向外弧出，主旅行运旺盛，一生中因出行或移居而带来重要机遇，异地发展运势颇佳，海外工作或生意有利可图。',
+    headline: '智慧线微微弯曲向下，延伸至月丘，主想象力丰富，艺术与创意天赋出众，在文学、音乐、设计、影视等创意领域有着天然的禀赋与发展潜力。',
+    heartline: '感情线长而微弯，末端有细小支线，主感情丰富细腻，对爱情有浪漫的追求，人生中感情波折或有，但最终能觅得真心相伴的灵魂伴侣。',
+    fateline: '命运线清晰且有支线延伸至太阳丘，主贵人运极旺，人生关键节点总有贵人及时出现，助力化解难关，事业上好运频频光顾。',
+  },
+  {
+    lifeline: '生命线粗壮有力，纹路深刻，主体能充沛，耐力超强，一生精力旺盛，即便到了老年依然活力四射，是家人和朋友眼中的能量磁场。',
+    headline: '智慧线笔直清晰且较长，延伸至无名指下方，主头脑敏锐，商业才能出众，善于捕捉市场机遇，财商极高，在投资理财与商业谈判中表现卓越。',
+    heartline: '感情线弧度深而清晰，延伸较长，主情感深厚，对亲情与爱情极为珍视，能给予伴侣充分的安全感，婚后家庭温馨，是优秀的另一半。',
+    fateline: '命运线清晰，中段有横向财纹交汇，主财运充沛，中年后财富迅速积累。此手相之人善于借助机遇实现财富跨越，商业嗅觉灵敏，投资眼光独到。',
+  },
+];
+
+// 痣相文本库
+const MOLE_TEXTS = [
+  '命主面部有贵痣隐于印堂附近，此乃智慧之痣，主思维超群，具有超凡的决策与判断能力，一生中逢大事皆有准确的直觉引导，鲜少走错方向。',
+  '命主颈部或耳后有隐痣，此乃福禄之痣，主一生衣食丰足，享受来自各方的照顾与馈赠，财帛不愁，晚年生活质量优越，子孙孝顺绕膝。',
+  '命主手腕或手掌有细小痣，此乃财痣，主理财眼光独到，中年后财库渐充，善于积累和运用财富，不论正财偏财皆有进益。',
+  '命主右肩或背部有痣，此乃任重之痣，主天生具备承担责任的能力，越是重压之下越能激发潜能，最终成就一番令人瞩目的事业。',
+  '命主人中附近有痣，此乃子孙痣，主与子女缘分深厚，儿女聪慧孝顺，家庭和睦美满，天伦之乐为命主一生最大的精神财富与幸福源泉。',
+];
+
+// 风水详细建议
+const FENGSHUI_TIPS = {
+  '木': {
+    good: '东方、东南方', color: '绿色、青色、翠绿色', plant: '富贵竹、绿萝、文竹、铁树',
+    avoid: '西方过重金属装饰及白色系过多',
+    bedroom: '卧室宜设于东方或东南方，床头朝向东方，有助于肝胆调养，晨起精力充沛，睡眠质量提升。床头后方不宜有窗，需有实墙依靠，象征有靠山。',
+    living: '客厅东南角为财位，可摆放富贵竹或铜钱树，搭配翠绿色装饰画，有助于聚财气。客厅中央避免摆放尖锐物品，保持空间通透明亮。',
+    kitchen: '厨房宜避开正东方，以免木火相克过旺。炉灶背后宜有实墙，象征稳固的经济来源，炉灶与水槽不宜正对，以防财水相冲。',
+    office: '办公桌宜朝东或东南，背后有实墙或书柜，主有靠山贵人。桌面保持整洁，右侧可摆放植物，左侧摆放水晶球，催旺文昌与财运。',
+    lucky_num: '3、8', lucky_gem: '绿幽灵、翡翠、橄榄石',
+  },
+  '火': {
+    good: '南方、西南方', color: '红色、橙色、紫色', plant: '红掌、凤梨、朱顶红',
+    avoid: '北方大量水景及黑色系装饰',
+    bedroom: '卧室宜设于南方，床头朝向南方或西南，有助于提升心脏功能与血气循环，夜间睡眠深沉，白天精神饱满。卧室灯光宜温暖柔和，避免强烈冷光。',
+    living: '客厅南面为贵人位，可摆放紫水晶洞或吉祥物，选用暖色系装饰，整体空间温馨大方。南墙可挂向阳花卉或红色抽象画，旺财聚气效果显著。',
+    kitchen: '厨房宜于南方，火气相合，烹饪运势佳，家庭饮食健康。炉灶不宜对门，以防散财；排烟管道保持畅通，象征财路顺畅无阻。',
+    office: '办公桌宜朝南，充分利用阳光能量提升工作热情与创造力。桌上可摆放红色文件夹或红玛瑙，激活事业进取心。避免桌面过于凌乱，影响思维清晰度。',
+    lucky_num: '2、7', lucky_gem: '红宝石、石榴石、红玛瑙',
+  },
+  '土': {
+    good: '中央、西南方、东北方', color: '黄色、土色、米色', plant: '黄金葛、多肉植物、仙人球',
+    avoid: '东方过多木质装饰及过强绿色',
+    bedroom: '卧室宜设于西南方，床头朝向西南，有助于脾胃调养，增强食欲与消化，整体健康状况改善。卧室地板宜选用木质或土色砖，脚踏实地有安全感。',
+    living: '客厅中央为土气聚集之处，可摆放黄水晶球或玛瑙摆件，选用米黄色系沙发与地毯，整体风格沉稳大方。窗台可摆放多肉植物，生机盎然又不失稳重。',
+    kitchen: '厨房宜在西南方，与土气相合，家人饮食均衡健康。厨房颜色宜选暖黄或米白，避免大面积冷色系。食材保持充足，象征家庭食禄丰厚。',
+    office: '办公桌宜朝向西南或中央位置，桌面可摆放黄水晶或琥珀，增强做事稳重性。文件整理有序，避免杂乱，保持良好的专业形象与工作效率。',
+    lucky_num: '5、0', lucky_gem: '黄水晶、琥珀、虎眼石',
+  },
+  '金': {
+    good: '西方、西北方', color: '白色、金色、银色', plant: '白掌、兰花、百合',
+    avoid: '南方过多红色及火气装饰',
+    bedroom: '卧室宜设于西方或西北方，床头朝向西方，有助于肺气调养，呼吸顺畅，睡眠安稳。卧室装饰宜简洁大方，白色或米白色调为主，营造清净高雅的休眠环境。',
+    living: '客厅西方为金气聚集之位，可摆放铜质或金属艺术摆件，搭配白色或金色系装饰品。沙发选用白色真皮或米白色布艺，格调高雅，贵气十足。',
+    kitchen: '厨房宜避开正西方，以免金气过旺影响消化。厨具保持光洁，不锈钢炊具象征金气旺盛。厨房宜保持通风良好，有助于气场流通，家运兴旺。',
+    office: '办公桌宜朝西北，此为乾位，主权威与决策力。桌上可摆放白水晶簇或金属笔筒，增强执行力与领导气场。办公室整洁有序，体现专业素养。',
+    lucky_num: '4、9', lucky_gem: '白水晶、月光石、钻石',
+  },
+  '水': {
+    good: '北方、东北方', color: '黑色、深蓝色、藏青色', plant: '荷花、水仙、碗莲',
+    avoid: '中央大面积水景及过强湿气',
+    bedroom: '卧室宜设于北方，床头朝向北方，有助于肾气调养，精力恢复快速。床下不宜堆放杂物，保持气场流通。卧室色调宜选深蓝或墨绿，有助于深度睡眠。',
+    living: '客厅北方可摆放流水喷泉或鱼缸（金鱼或锦鲤），有效催动财气与智慧运。水景需保持清洁流动，死水则适得其反。藏青色系地毯或沙发垫点缀其中，格调沉稳内敛。',
+    kitchen: '厨房宜避开正北，水火相冲不吉。厨房颜色避免全黑，可用白色或米色调和。水槽下方管道保持畅通，避免漏水，象征财水不外泄。',
+    office: '办公桌宜朝北，激活智慧与学习运，适合需要大量创意思维的工作。桌上摆放小型流水摆件或黑曜石球，增强思维灵活性与判断力。',
+    lucky_num: '1、6', lucky_gem: '黑曜石、海蓝宝、蓝宝石',
+  },
+};
+
+// 财运文本库（大幅扩充）
+const WEALTH_TEXTS = [
+  {
+    general: '命主八字财星有力，正偏财兼备，财运底蕴深厚。正财方面，命主凭借稳健的工作态度与专业能力，薪资收入持续稳步增长，不愁温饱。偏财方面，命主对市场机遇嗅觉灵敏，擅长把握时机布局，逢合适年份可获颇丰的额外收益。',
+    strategy: '命主理财之道宜"攻守兼备"：以正财打底，以偏财冲击。建议将收入的60%用于稳健储蓄与基金定投，30%用于相对积极的股票或行业ETF，10%保留流动资金应急，如此可在保障安全边际的前提下，实现财富的持续稳健增长。',
+    warning: '需警惕逢比劫旺盛年份出现破财风险，此类年份人际间财务往来纠纷增多，切记不轻易为他人作担保，借出款项务必白纸黑字留存凭证，防止好心变恶果。',
+    peak: '命主财运高峰期预计在35至45岁之间，此阶段正财与偏财双双旺盛，若能把握住这一黄金十年的机遇，财富积累将实现质的飞跃，为后半生奠定坚实基础。',
+  },
+  {
+    general: '命主财库充盈，八字中财星坐库，擅长积累与保存财富，是典型的"藏富于内"之命格。正财方面，依托稳定职业可确保基本富足；偏财方面，命主对于不动产、固定资产类投资颇有眼光，此类投资往往能带来超预期的长期回报。',
+    strategy: '命主最适合的财富积累方式为"以时间换空间"的长期投资策略。定期定额投入指数基金，购置核心地段不动产，耐心等待价值回归。切忌短线频繁交易，越急于求财往往越容易损失惨重，静候花开方为上策。',
+    warning: '流年与财星相冲之年，需格外谨慎投机性投资，如高杠杆理财产品、虚拟货币等高波动品种。此类年份宜稳守阵地，将资金转移至低风险固定收益类产品，保住既有财富比追求高收益更为重要。',
+    peak: '命主财运底色稳健，但偏财之气在40岁后方才真正爆发，届时人脉资源与投资经验双双成熟，把握某一重大机遇便可实现财富的跨越式增长，所谓"大器晚成"，正是此命格之写照。',
+  },
+  {
+    general: '命主八字带有明显的偏财格局，天生具有商业头脑，财来财往之间驾轻就熟。命主财路宽广，不仅限于工资收入，版权、投资、合伙分红、副业收入等多元化财源均有良好发展潜力，是典型的多元财富型命格。',
+    strategy: '命主宜以"开源"为主要策略，着力拓展多元化收入渠道。可考虑以主业为根基，同步发展知识变现（课程、咨询、自媒体）、项目合伙或天使投资等副业，逐步构建被动收入体系，最终实现财务自由。',
+    warning: '命主偏财旺盛，但"来得快去得也快"的风险同样存在。需特别注意感情与财运的相互影响，恋爱或婚姻变动往往伴随财务波动，建议在感情稳定的前提下再大力布局投资，切勿因情绪波动做出非理性的财务决策。',
+    peak: '命主偏财高峰出现在每逢天干食伤旺盛之年，具体为甲乙丙丁年均有良好的偏财机遇。建议在此类年份前提前准备好资金与项目，以雷霆之势把握住稍纵即逝的财富机遇，厚积而薄发。',
+  },
+];
+
+// 月度财运
+const MONTHLY_WEALTH = [
+  {icon:'★★★★★', text:'财星当令，正偏财双旺，投资决策极佳期，把握时机主动出击'},
+  {icon:'★★★★☆', text:'贵人财助入命，商务合作机遇旺盛，谈判签约大吉'},
+  {icon:'★★★☆☆', text:'正财平稳，宜保守理财，不宜大额投机，静待时机'},
+  {icon:'★★★★☆', text:'偏财星动，有意外之财惊喜，但需注意防止因小失大'},
+  {icon:'★★☆☆☆', text:'比劫犯财，人际财务往来需谨慎，防借贷纠纷与担保风险'},
+  {icon:'★★★★★', text:'财库大开，正偏财齐旺，年内最佳进财月份，全力以赴'},
+  {icon:'★★★☆☆', text:'财运平稳，宜做好财务规划，检视投资组合，调整仓位'},
+  {icon:'★★★★☆', text:'贵人带财入门，机遇来自合作伙伴，商议合伙或投资'},
+  {icon:'★★★☆☆', text:'财气受阻，避免大额消费与投资，保守为上，守住现有财富'},
+  {icon:'★★★★☆', text:'偏财旺盛，股票、基金等投资有较好表现，关注市场动向'},
+  {icon:'★★★★★', text:'年内财运第二高峰，正财偏财俱旺，谋事动势事半功倍'},
+  {icon:'★★★★☆', text:'年末财运收官，宜盘点全年财务，做好来年的财富布局规划'},
+];
+
+// 事业文本库（大幅扩充）
+const CAREER_TEXTS = [
+  {
+    general: '命主八字官星有力且与日主形成良好格局，仕途运势颇佳。命主天生具备领导气质，处理事务条理清晰，善于协调各方关系，在团队中自然形成权威与影响力。机关单位、国有企业、金融机构等稳定性强的体制内工作，是最契合命主气质与命运走向的职业选择。',
+    growth: '命主的职业发展轨迹呈"厚积薄发"型：前期（25-35岁）积累经验与人脉，中期（35-45岁）迎来晋升高峰期，贵人提携接踵而至，后期（45岁以后）稳坐高位，声望日隆。关键在于前期务必踏踏实实夯实专业基础，切勿急功近利。',
+    partner: '命主适合与属龙、属鼠或属猴之人合作共事，此类合作伙伴与命主五行相合，互相补短，能在关键时刻提供重要的资源与帮助，合作项目往往超预期完成。',
+    warning: '逢比劫旺盛年份（如庚辛流年），职场竞争加剧，同事或下属有抢功劳或背后使绊的风险，此类年份宜低调行事，专注本职工作，减少不必要的暴露与争议。',
+  },
+  {
+    general: '命主食神生财格局明显，才华是最大的职场竞争力。命主思维富有创意，能将抽象想法转化为落地方案，在需要创新与专业技能的岗位上如鱼得水。科技研发、文化创意、咨询顾问、自媒体运营等以智力资本为核心的行业，是命主发挥所长、实现财务自由的最佳舞台。',
+    growth: '命主职业发展宜走"专家路线"，深耕某一垂直领域，成为行业内不可替代的稀缺人才。建议在30岁前确定核心专业方向，此后持续深化，争取在35-40岁成为行业内有影响力的意见领袖或资深专家，收入与影响力将随声誉双双飞速提升。',
+    partner: '命主适合与属羊、属兔或属猪之人合作，此类伙伴感性细腻，能与命主的理性逻辑互补，在策划、创意与落地执行之间形成高效配合，共同完成创意型项目。',
+    warning: '命主才华出众，有时容易因方案被质疑而产生情绪波动，需注意控制伤官见官的负面影响，即切勿在上司面前过于锋芒毕露或直接反驳，宜用建设性方式表达不同意见，以维护职场关系的和谐。',
+  },
+  {
+    general: '命主印星护身，学习能力超强，知识积累深厚，是典型的"以知识换财富"型命格。命主处事沉稳，说话有分量，具备天然的权威感，适合在教育、培训、咨询、出版、法律等以专业知识与公信力为核心的行业深耕发展，声誉资产是最宝贵的职业财富。',
+    growth: '命主职业路径的高光时刻多出现在"逢印"的流年或大运，即壬癸流年、亥子流年，此类年份学习运与贵人运同步爆发，是进修提升、考取重要证书或资格的最佳时机，把握此类年份的学习机遇，事业层级将显著跃升。',
+    partner: '命主适合与属牛、属蛇或属鸡之人合作，此类伙伴踏实稳重，善于执行与落地，能有效弥补命主偏重思考规划而执行力稍弱的不足，形成1+1>2的强强联合。',
+    warning: '命主偶有过于理想化或犹豫不决的倾向，面对重要机遇时需克服选择困难症，适时出击。逢杀旺年份（庚辛申酉年），工作压力明显增大，需注意身心健康，适度减压，防止过度消耗身体影响长期发展。',
+  },
+];
+
+// 感情婚姻文本库
+const LOVE_TEXTS = {
+  male: [
+    {
+      general: '命主八字中财星旺盛，桃花运势绝佳，对异性具有天然的吸引力，一生中追求者颇多。命主重感情，一旦认定另一半便会全力呵护，是令伴侣感到无比安心与珍视的恋人。婚后家庭责任感强，以家庭为重心，努力为家人打造稳定幸福的生活环境。',
+      spouse: '命主的理想伴侣特征：外形端庄秀丽，气质温婉大方；性格温柔体贴，善于持家；在事业上有一定追求，能与命主相互支持；属相以羊、兔、猪为佳，五行属水或木的女性与命主最为相合，感情基础稳固。',
+      timing: '命主姻缘旺盛时期：25-28岁为第一桃花运高峰，27岁附近有重要感情节点；32-36岁为第二波姻缘高峰，彼时人生阅历与经济基础双双成熟，是结婚成家的最佳时机窗口。',
+      advice: '建议命主在感情中保持适度的主动性，勇于表达真实情感，不要因为面子问题错过心仪的对象。同时需注意避免在工作压力最大的时期（申酉流年）轻率做出感情决定，此类时期情绪易受外界干扰，判断力略有偏差。',
+    },
+    {
+      general: '命主八字官杀兼备，感情世界颇为复杂，桃花机遇不少，但感情路上也有一定波折。命主对爱情有较高的期待与标准，因此在感情筛选上较为谨慎，有时会给自己与对方造成一定压力。一旦确定稳定关系，命主会展现出极为忠诚与体贴的一面。',
+      spouse: '命主的理想伴侣特征：独立自主，有事业心与上进心；外形清丽，气质内敛而有深度；理解命主的工作压力，能给予情绪上的支持与包容；五行属水的女性或属鼠、属猪之人与命主最为相合，两人互相滋养，感情愈久愈深厚。',
+      timing: '命主感情机遇在28-32岁之间最为旺盛，此阶段贵人与桃花同步出现，有望在此期间遇见令自己心动且志同道合的伴侣。36岁后感情趋于稳定，若尚未婚配，此时遇到的伴侣往往更加成熟理性，婚姻基础更为牢固。',
+      advice: '命主在感情中需注意平衡事业与感情的投入比重，避免因过度专注于工作而忽略伴侣的情感需求。逢甲乙寅卯流年，桃花运特别旺盛，宜主动参加社交活动，拓展人际圈，增加遇见合适伴侣的机率。',
+    },
+  ],
+  female: [
+    {
+      general: '命主八字官星入命，感情运势旺盛，对异性颇具吸引力，追求者众多。命主骨子里有对美好爱情的执着向往，渴望遇见一段相互尊重、彼此成就的高质量伴侣关系。婚后命主是称职的贤内助，能在家庭与事业间找到平衡，令家庭关系和谐温馨。',
+      spouse: '命主的理想伴侣特征：有事业心与责任感，在社会上有一定地位与影响力；外形稳重大气，给人以安全感；性格沉稳成熟，能在情绪上包容命主的细腻敏感；属相以虎、马、狗为佳，五行属火或土的男性与命主最为相合，两人相互激励，共同成长。',
+      timing: '命主第一段重要感情缘分出现在23-27岁之间；婚姻缘分最旺盛时期为28-32岁，此阶段五行与官星双双旺盛，命中注定的良缘伴侣往往在此期间出现，切勿因过于挑剔而错失缘分。',
+      advice: '建议命主在感情中保持真实自我，不必过度迎合对方。同时需注意提防感情中的"第三者"干扰，逢比肩劫财旺盛年份（庚辛流年）感情受到竞争者威胁的概率较大，宜在此类年份加强与伴侣的沟通与联结，稳固感情基础。',
+    },
+    {
+      general: '命主八字带有旺盛的桃花星，天生具有令人着迷的魅力，感情生活丰富多彩。命主重情义，感情细腻深沉，对爱情充满热情与想象，渴望一段心灵契合、灵魂共鸣的深度关系。需注意防止因感情过于冲动而做出后悔的决定，凡事三思后行。',
+      spouse: '命主的理想伴侣特征：智慧风趣，能在精神层面与命主交流共鸣；外形亮眼，在人群中有辨识度；对家庭忠诚，有稳定的经济能力；属相以兔、羊、猪为佳，五行属木或水的男性与命主最为相合，两人在一起相互滋润，越来越契合。',
+      timing: '命主桃花运在26-30岁之间集中爆发，此阶段感情缘分旺盛，有望遇见真命天子。若此阶段已成婚，婚姻运势同样极旺，夫妻感情甜蜜，是生育子女的吉祥时期。35岁后命主感情趋于成熟稳重，亲密关系的质量进一步提升。',
+      advice: '命主在感情中需学会适度"放手"，给彼此保留空间，避免因占有欲过强而造成对方的压迫感。逢丙丁火旺流年，感情热度极高，容易因冲动而做出重大感情决定，此类年份宜多沟通、少冲动，给感情留出自然发展的余地。',
+    },
+  ],
+};
+
+// 健康运势文本库
+const HEALTH_TEXTS = {
+  '木': {
+    organ: '五行木气主肝胆系统，命主需重点关注肝脏健康，定期体检肝功能指标。春季（3-5月）为木气旺盛时节，此时身体代谢旺盛，是排毒养肝的最佳时期，宜多食绿色蔬菜、枸杞、决明子茶，保护肝脏，清热明目。',
+    risk: '命主肝火偏旺，需注意控制情绪，避免长期压抑或暴怒，以防肝气郁结。同时需关注眼睛健康，过度用眼（长时间盯屏幕）会损耗肝血，建议每隔一小时让眼睛休息，并保证充足的睡眠时间。',
+    season: '木气在秋冬季节（9-2月）相对受克，此时段命主免疫力可能略有下降，需注意预防季节性感冒与呼吸道疾病，适当补充维生素C，保持居室通风，出行注意保暖。',
+    advice: '养生建议：早睡早起（最佳入睡时间23点前），保持每周3-4次的中等强度有氧运动，如慢跑、游泳、瑜伽；饮食以清淡为主，避免油腻辛辣，少饮酒；保持积极乐观的心态，定期与朋友倾诉，释放压力。',
+    lucky_food: '绿色蔬菜（菠菜、西兰花）、核桃、黑芝麻、枸杞、蓝莓、鸡肉',
+  },
+  '火': {
+    organ: '五行火气主心脏与血液循环系统，命主需重点关注心脏健康，定期监测血压与心率。夏季（6-8月）为火气旺盛时节，此时需特别注意防暑降温，避免心脏过度负荷，宜多食莲子、百合、绿豆等清心降火食材。',
+    risk: '命主心火偏旺，易出现情绪亢奋、睡眠质量差（多梦易醒）、口腔溃疡等上火症状。同时需关注小肠健康，饮食宜规律，避免暴饮暴食，减少高糖高脂食物摄入，以维护心脏与消化系统的健康。',
+    season: '冬季（11-2月）水克火，此时段命主心脏功能可能相对偏弱，需注意保暖，尤其是胸腹部保温，减少剧烈运动，选择太极、散步等温和锻炼方式，降低心脏突发事件的风险。',
+    advice: '养生建议：保持充足睡眠，中午可小憩20-30分钟以养心气；坚持有氧运动但注意控制心率，避免过度激烈；培养静心的爱好（如书法、冥想、品茶），有效降低心理压力；定期做心电图检查，尤其40岁后每年体检不可忽视。',
+    lucky_food: '红豆、莲子、西红柿、草莓、红薯、鸡心、枸杞',
+  },
+  '土': {
+    organ: '五行土气主脾胃系统，命主需重点关注消化系统健康。长夏（7-8月）为土气旺盛时节，此时湿气较重，易出现脾胃不适、食欲不振等症状，宜食薏仁、山药、红豆等健脾祛湿食材，保护脾胃功能。',
+    risk: '命主脾胃偏弱者易出现消化不良、腹胀腹泻、疲乏无力等症状。需特别注意饮食规律，避免暴饮暴食，忌食生冷寒凉食物，减少对肠胃的刺激；同时需关注口腔健康，定期检查牙齿，防止口腔问题影响消化功能。',
+    season: '梅雨季节（5-6月）湿气最重，土气受湿邪影响，此时命主最易出现脾胃不适与关节酸痛，宜多食健脾化湿食物，适当艾灸或推拿脾胃经络，保持室内干燥通风。',
+    advice: '养生建议：饮食规律，三餐定时定量，细嚼慢咽；避免边吃饭边看手机；适量运动助消化，饭后20分钟散步效果极佳；保持情绪平稳，过度思虑是伤脾的大敌；定期做胃镜检查，尤其有胃部不适史者需提前筛查。',
+    lucky_food: '山药、红薯、南瓜、小米、牛肉、蜂蜜、大枣',
+  },
+  '金': {
+    organ: '五行金气主肺与大肠系统，命主需重点关注呼吸系统健康。秋季（9-11月）为金气旺盛时节，此时燥气较重，易出现皮肤干燥、咽喉不适等症状，宜多食银耳、梨、百合、白木耳等润肺养阴食材，保护肺气。',
+    risk: '命主肺气较敏感，易受季节性过敏与空气质量影响，需注意防范呼吸道疾病（如哮喘、鼻炎、支气管炎）。同时关注大肠健康，保持良好的排便习惯，多摄入膳食纤维，预防便秘与肠道炎症。',
+    season: '春季（3-5月）木克金，此时呼吸道抵抗力相对偏弱，花粉、尘螨等过敏原增多，需做好防护，空气质量差时出门佩戴口罩，家中可放置空气净化器改善居室空气质量。',
+    advice: '养生建议：坚持腹式呼吸练习（每天10分钟深呼吸），增强肺活量；选择游泳、太极、瑜伽等对呼吸系统友好的运动；注意皮肤保湿，秋冬季节多涂润肤霜；戒烟并远离二手烟，这是保护肺气最直接有效的措施。',
+    lucky_food: '白萝卜、梨、银耳、百合、豆腐、鸭肉、杏仁',
+  },
+  '水': {
+    organ: '五行水气主肾与膀胱系统，命主需重点关注肾脏健康，定期检查尿常规与肾功能。冬季（11-1月）为水气旺盛时节，此时宜进行温补，多食黑色食物（黑豆、黑芝麻、黑木耳）以补肾益精，保护先天之本。',
+    risk: '命主肾气较敏感，需注意预防腰膝酸软、耳鸣、脱发等肾虚症状。同时关注膀胱健康，保证充足饮水量（每日1500-2000ml），避免憋尿，减少泌尿系统感染风险。长期熬夜是损耗肾精的头号杀手，需引起高度重视。',
+    season: '夏季（6-8月）火克水，肾气受消耗最为旺盛，此时段需特别注意补水与防暑，避免大汗淋漓导致肾液过度流失，宜食西瓜、冬瓜等清热利水食材，同时避免过食冷饮伤害阳气。',
+    advice: '养生建议：保持规律作息，最佳入睡时间为22:30之前，子时（23-1点）为肾经当令，此时深度睡眠对肾脏修复意义重大；坚持每天散步或游泳；注重腰部保暖，不要长时间坐在凉地上；适当食用黑色食物补肾，必要时咨询中医进行调理。',
+    lucky_food: '黑豆、黑芝麻、核桃、海参、枸杞、羊肉、山药',
+  },
+};
+
+const QIANWEN = [
+  { text: '蛟龙得水，一飞冲天', explain: '此签主运势大开，如蛟龙入海，一切顺遂。当前是乘风破浪的最佳时机，宜主动出击，把握机遇，必能成就一番大业。' },
+  { text: '潜龙勿用，积蓄待发', explain: '此签主当下宜静不宜动，如蛰伏之龙，等待时机。眼前形势复杂，不宜贸然行动，应沉心积蓄能量，待时机成熟，一击必中。' },
+  { text: '厚德载物，笃行致远', explain: '此签主品德为先，福报自来。命主当以厚道待人，积累善缘，不急功近利，一步一个脚印踏实前行，终能走出一条宽广的人生大道。' },
+  { text: '否极泰来，柳暗花明', explain: '此签主困境将过，好运即至。即便当前遭遇挑战与阻碍，切莫气馁，黑暗后必见曙光，坚持住这最后的困难时期，转机近在眼前。' },
+  { text: '水善利万物而不争', explain: '此签引《道德经》之义，主以柔克刚，不争自胜。命主宜效法水之德性，谦逊处下，以包容与智慧化解矛盾，不与人争高下，却能自然处于最有利的位置。' },
+  { text: '守正出奇，厚积薄发', explain: '此签主稳扎稳打方为上策。命主需在正道上坚持积累，等到积累足够深厚之时，将以令人惊叹的方式厚积薄发，成就超乎他人预料的辉煌成果。' },
+  { text: '花开自有时，守得云开', explain: '此签主时机未到，静待花开。命主所期盼的目标正在酝酿成熟，无需焦虑，保持内心平静与信念，时机一到，一切将如期绽放，超越所有等待的价值。' },
+  { text: '道法自然，无为而治', explain: '此签引道家至高智慧，主顺势而为。命主无需强行改变现状，应顺应天时地利人和，让事物按照自然规律发展，往往能收到意想不到的好结果。' },
+  { text: '一元复始，万象更新', explain: '此签主新的开始，万物更新。命主正处于人生新阶段的起点，过去的种种已翻篇，以全新的心态迎接未来，一切充满无限可能，大好时光正在开启。' },
+  { text: '修身齐家，功成名就', explain: '此签主内外兼修，方成大器。命主需从自身做起，修炼品格与能力，同时经营好家庭关系，内外兼顾，如此则事业与家庭双丰收，功成名就自然水到渠成。' },
+];
+
+// 大运推算辅助
+function getDaYun(data, pillars) {
+  const age = new Date().getFullYear() - data.year;
+  const results = [];
+  for (let i = 0; i < 5; i++) {
+    const startAge = 8 + i * 10;
+    const endAge = startAge + 9;
+    const si = (pillars[1].si + (data.gender === 'male' ? 1 : -1) * (i + 1) * 2 + 100) % 10;
+    const bi = (pillars[1].bi + (data.gender === 'male' ? 1 : -1) * (i + 1) * 2 + 120) % 12;
+    const startYear = data.year + startAge;
+    const isCurrent = age >= startAge && age <= endAge;
+    results.push({ stem: STEMS[si], branch: BRANCHES[bi], startAge, endAge, startYear, isCurrent, si, bi });
+  }
+  return results;
+}
+
+// ============================================================
+//  渲染函数（大幅扩充）
+// ============================================================
+function renderBazi(data, pillars, elemCnt, rand) {
+  const maxE = Math.max(...Object.values(elemCnt));
+  const dominant = Object.entries(elemCnt).sort((a,b)=>b[1]-a[1])[0][0];
+  const weak = Object.entries(elemCnt).sort((a,b)=>a[1]-b[1])[0][0];
+  const elemCSSMap = {'木':'wood','火':'fire','土':'earth','金':'metal','水':'water'};
+
+  // 格局
+  const geju = pick(GEJU_NAMES, rand);
+  // 用神
+  const yongshenElem = pick(['木','火','土','金','水'], rand);
+  // 日主
+  const rizhu = RIZHU_CHAR[pillars[2].stem];
+  // 强弱
+  const qiangRuo = pick(['身强','身弱','身中和'], rand);
+
+  const strengthDesc = {
+    '木':'五行木气旺盛，主仁慈好学，富有生命力与创造力，具备天生的教育与医疗天赋，适合绿色生态、文化教育、医疗健康等行业深耕发展。',
+    '火':'五行火气旺盛，性情热烈进取，领导力出众，感召力强，适合销售管理、文娱传媒、餐饮服务等行业，能量满满，旺自旺人。',
+    '土':'五行土气旺盛，性格稳重踏实，信誉卓著，适合房产建筑、农业食品、金融财务等稳健型行业，是天生的守业能手与资产管理者。',
+    '金':'五行金气旺盛，性格坚毅果断，执行力与纪律性超强，适合法律军警、金融投行、机械工程等对精准度与决断力要求极高的行业。',
+    '水':'五行水气旺盛，智慧过人，应变能力极强，适合跨境贸易、外交谈判、互联网科技、哲学研究等需要宏观思维与快速迭代的行业。',
+  };
+  const weakDesc = {
+    '木':'五行木气偏弱，宜多接触自然环境，在绿色植物旁办公或居住有助于补充木气。日常多穿绿色、青色系服装，可于东方或东南方摆放富贵竹，有助于财运与健康双双提升。',
+    '火':'五行火气偏弱，宜多晒太阳补充阳气，南方或户外活动能有效激活火气。家居装饰可在南方增添暖光源或红色摆件，有助于提振精神，激活向上的生命热情与行动力。',
+    '土':'五行土气偏弱，宜强化脚踏实地的行动力，多做储蓄与固定资产计划。日常佩戴黄水晶或虎眼石，多食黄色土性食物（山药、南瓜、玉米），有助于稳固命运根基。',
+    '金':'五行金气偏弱，宜提升决断力与执行力，适当佩戴黄金、白银等金属饰品。注意肺部健康，坚持有氧运动，西方城市发展运势优于东方，考虑向西部地区发展。',
+    '水':'五行水气偏弱，宜多喝水、常近水，保持思维活跃灵动。家中北方可摆放小型流水摆件，多阅读哲学与历史书籍以补充水的智慧，关注肾脏与泌尿系统健康。',
+  };
+
+  const pillarLabels = ['年柱','月柱','日柱','时柱'];
+  const bziHtml = pillars.map((p, i) => `
+    <div class="pillar">
+      <div class="pillar-label">${pillarLabels[i]}</div>
+      <div class="pillar-stem ${ELEM_COLOR[STEM_ELEM[p.si]]}">${p.stem}</div>
+      <div class="pillar-branch ${ELEM_COLOR[BRANCH_ELEM[p.bi]]}">${p.branch}</div>
+    </div>
+  `).join('');
+
+  const wuxingHtml = ['木','火','土','金','水'].map(e => `
+    <div class="wuxing-${elemCSSMap[e]}">
+      <div class="wuxing-item">
+        <div class="wuxing-name">${e}</div>
+        <div class="wuxing-count">${elemCnt[e]}个</div>
+        <div class="wuxing-bar-wrap"><div class="wuxing-bar" style="width:${(elemCnt[e]/maxE)*100}%"></div></div>
+      </div>
+    </div>
+  `).join('');
+
+  const overallScore = score(rand, 72, 28);
+  const detailScores = [
+    { name: '命格强弱', val: score(rand, 70, 28) },
+    { name: '日主旺衰', val: score(rand, 68, 28) },
+    { name: '印星护命', val: score(rand, 65, 32) },
+    { name: '官杀格局', val: score(rand, 72, 25) },
+    { name: '财星入命', val: score(rand, 68, 30) },
+    { name: '食伤生财', val: score(rand, 70, 26) },
+  ];
+
+  // 大运
+  const dayunList = getDaYun(data, pillars);
+  const dayunHtml = dayunList.map(d => `
+    <div class="year-card" style="${d.isCurrent?'border-color:var(--gold);background:var(--bg3)':''}">
+      <div class="year-num">${d.startAge}-${d.endAge}岁${d.isCurrent?'<span style="color:var(--gold)"> ◆当前</span>':''}</div>
+      <div class="year-gz" style="color:${ELEM_COLOR[STEM_ELEM[d.si]]?'':''}">${d.stem}${d.branch}运</div>
+      <div style="font-size:0.75rem;color:var(--text-dim);margin-top:4px">${d.startYear}年起</div>
+    </div>
+  `).join('');
+
+  const currentDayun = dayunList.find(d=>d.isCurrent) || dayunList[0];
+  const dayunDesc = pick(DAYUN_DESC, rand)
+    .replace('{stem}', currentDayun.stem)
+    .replace('{branch}', currentDayun.branch)
+    .replace('{elem}', STEM_ELEM[currentDayun.si]);
+
+  const qianwenItem = pick(QIANWEN, rand);
+
+  return `
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">☰</span> 八字命盘排布</div>
+      <div class="bazi-display">${bziHtml}</div>
+      <p>命主生辰八字为 <strong style="color:var(--gold)">${pillars.map(p=>p.stem+p.branch).join(' ')}</strong>，
+      属<strong style="color:var(--gold)">${data.zodiac}</strong>年，
+      日主天干为<strong style="color:var(--gold)">${pillars[2].stem}</strong>，
+      五行以<strong>${dominant}</strong>为主、<strong>${weak}</strong>最弱，命局整体呈<strong>${qiangRuo}</strong>之象。</p>
+      <p>命局格局判定为<strong style="color:var(--gold)">「${geju}」</strong>，${GEJU_DESC[geju]}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◎</span> 日主性格深度解析</div>
+      <p>${rizhu}</p>
+      <p>${strengthDesc[dominant]}</p>
+      <p>${weakDesc[weak]}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬡</span> 五行分布与用神忌神</div>
+      <div class="wuxing-grid">${wuxingHtml}</div>
+      <p><strong style="color:var(--gold)">用神：${yongshenElem}</strong> — ${YONGSHEN_DESC[yongshenElem]}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◈</span> 命格综合评分</div>
+      <div class="score-row" style="margin-bottom:12px;">
+        <span class="score-label" style="font-size:0.95rem;color:var(--gold)">综合命格</span>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${overallScore}%"></div></div>
+        <span class="score-val" style="font-size:1rem">${overallScore}分</span>
+      </div>
+      ${detailScores.map(s=>`
+        <div class="score-row">
+          <span class="score-label">${s.name}</span>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:${s.val}%"></div></div>
+          <span class="score-val">${s.val}分</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◉</span> 大运排布（十年一换）</div>
+      <div class="year-grid">${dayunHtml}</div>
+      <p style="margin-top:14px">${dayunDesc}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">✦</span> 命主签文</div>
+      <div class="qianwen">
+        <strong>✦ 天机签语 ✦</strong>
+        ${qianwenItem.text}
+      </div>
+      <p style="margin-top:12px;color:var(--text-dim);font-size:0.88rem;line-height:1.9">${qianwenItem.explain}</p>
+    </div>
+  `;
+}
+
+function renderFace(data, pillars, rand) {
+  const faceSet = pick(FACE_TEXTS[data.gender], rand);
+  const palmSet = pick(PALM_TEXTS, rand);
+  const moleText = pick(MOLE_TEXTS, rand);
+
+  const faceAspects = [
+    { name:'额头（官禄宫）', val: score(rand,70,28) },
+    { name:'印堂（疾厄宫）', val: score(rand,72,24) },
+    { name:'眉眼（兄弟宫）', val: score(rand,70,26) },
+    { name:'鼻（财帛宫）', val: score(rand,68,30) },
+    { name:'颧骨（事业宫）', val: score(rand,71,25) },
+    { name:'口唇（福德宫）', val: score(rand,74,22) },
+    { name:'耳（寿命宫）', val: score(rand,75,20) },
+    { name:'下巴（晚年宫）', val: score(rand,72,24) },
+    { name:'法令（名声宫）', val: score(rand,69,28) },
+  ];
+
+  const qiSeDesc = [
+    '命主近期面色红润有光泽，气色极佳，预示运势正处于上升通道，身心状态良好，精力充沛，凡事开展顺利。',
+    '命主气色白里透红，精气神饱满，暗示财运与健康运双双旺盛，是出行、社交、洽谈合作的绝佳时机。',
+    '命主印堂发亮，面部光泽均匀，主贵人运旺盛，近期将有贵人主动提携，带来意想不到的好机遇。',
+  ];
+
+  const characterDesc = data.gender === 'male'
+    ? `命主男性阳刚之气充足，外表${pick(['端正稳重','英气勃发','温文儒雅','沉着内敛'], rand)}，内心${pick(['坚韧果敢','志向远大','仁厚善良','智慧超群'], rand)}。凡事主动进取，独立自强，事业心旺盛，遇挫折能迅速振作，愈挫愈勇。人生关键贵人往往以${pick(['上级领导','恩师长辈','商业伙伴','异性好友'], rand)}的形式出现，把握此类缘分，命运将大为改观。`
+    : `命主女性阴柔中透坚韧，外表${pick(['端庄秀丽','温婉大方','清秀灵动','雅致从容'], rand)}，内心${pick(['坚韧执着','温柔博爱','聪慧敏锐','乐观开朗'], rand)}。处事细腻周到，极具亲和力与同理心，同时心志坚定不轻言放弃。人生关键贵人往往以${pick(['职场上司','闺蜜至交','伴侣家人','陌生人意外之缘'], rand)}的形式降临，把握此类机缘，命运将迎来转折。`;
+
+  return `
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◎</span> 面相总论</div>
+      <p>${faceSet.head}</p>
+      <p>${faceSet.eye}</p>
+      <p>${faceSet.nose}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">☰</span> 面部五官深度解读</div>
+      <p>${faceSet.ear}</p>
+      <p>${faceSet.mouth}</p>
+      <p>${faceSet.chin}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◈</span> 面部十二宫评分</div>
+      ${faceAspects.map(a=>`
+        <div class="score-row">
+          <span class="score-label" style="min-width:120px">${a.name}</span>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:${a.val}%"></div></div>
+          <span class="score-val">${a.val}分</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">✦</span> 手相解读</div>
+      <p>${palmSet.lifeline}</p>
+      <p>${palmSet.headline}</p>
+      <p>${palmSet.heartline}</p>
+      <p>${palmSet.fateline}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬡</span> 痣相与气色分析</div>
+      <p>${moleText}</p>
+      <p>${pick(qiSeDesc, rand)}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬟</span> 命格性情综合解析</div>
+      <p>${characterDesc}</p>
+    </div>
+  `;
+}
+
+function renderFengshui(data, pillars, elemCnt, rand) {
+  const dominant = Object.entries(elemCnt).sort((a,b)=>b[1]-a[1])[0][0];
+  const tip = FENGSHUI_TIPS[dominant];
+
+  const dirLuck = ['大吉','吉','平','平','凶'].sort(()=>rand()-0.5);
+  const dirs = [
+    {pos:'北', lu:dirLuck[0]}, {pos:'东北', lu:dirLuck[1]},
+    {pos:'东', lu:dirLuck[2]}, {pos:'西北', lu:dirLuck[3]},
+    {pos:'中', lu:'命位'},{pos:'东南', lu:dirLuck[1]},
+    {pos:'西', lu:dirLuck[3]}, {pos:'西南', lu:dirLuck[4]},
+    {pos:'南', lu:dirLuck[2]},
+  ];
+  const luckClass = lu => lu==='大吉'?'good':lu==='吉'?'good':lu==='命位'?'':lu==='凶'?'bad':'neutral';
+
+  const compassHtml = dirs.map(d=>`
+    <div class="compass-cell ${d.lu==='命位'?'center':''}">
+      <div class="dir">${d.pos}</div>
+      <div class="luck ${luckClass(d.lu)}">${d.lu}</div>
+    </div>`).join('');
+
+  const caiwei = pick(['东南角','南方财位','西北贵人位','正北方'], rand);
+
+  return `
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬡</span> 本命风水方位图</div>
+      <div class="compass">${compassHtml}</div>
+      <p>命主五行偏<strong>${dominant}</strong>，居家宜将主要活动区域安排在<strong style="color:var(--gold)">${tip.good}</strong>方位，以顺应五行之气，借助地气加持，运势自然提升。</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◎</span> 居家风水总体建议</div>
+      <div class="tip-grid">
+        <div class="tip-item">
+          <div class="tip-label">✦ 吉利方位</div>
+          <div class="tip-value">${tip.good}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 幸运颜色</div>
+          <div class="tip-value">${tip.color}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 吉祥植物</div>
+          <div class="tip-value">${tip.plant}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 宜避事项</div>
+          <div class="tip-value">${tip.avoid}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 幸运数字</div>
+          <div class="tip-value">${tip.lucky_num}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 开运宝石</div>
+          <div class="tip-value">${tip.lucky_gem}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◈</span> 卧室风水详解</div>
+      <p>${tip.bedroom}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">☰</span> 客厅与工作区风水</div>
+      <p>${tip.living}</p>
+      <p>${tip.office}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">✦</span> 厨房风水与财位催财</div>
+      <p>${tip.kitchen}</p>
+      <p>命主宅中财位在<strong style="color:var(--gold)">${caiwei}</strong>，此处宜保持整洁明亮，可摆放黄水晶簇、铜制元宝或流水摆件，切勿堆放杂物或垃圾桶，以免煞气入侵，破坏财位气场，影响进财。</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬟</span> 出行方位与开运建议</div>
+      <p>命主今年出行或出差，宜朝<strong style="color:var(--gold)">${tip.good}</strong>方向前往，可遇贵人，逢凶化吉。商务谈判时，宜选择${pick(['南向','东向','北向','西向'], rand)}座位或会议室，在方位气场辅助下谈判往往更加顺利，对方更易接受命主的方案与条件。</p>
+      <p>日常开运小贴士：在${tip.good}方摆放${tip.plant}，以${tip.color}系物品点缀装饰，佩戴${tip.lucky_gem}，可显著提升整体运势，营造良好的个人气场循环，旺财旺运双管齐下。</p>
+    </div>
+  `;
+}
+
+function renderWealth(data, pillars, rand) {
+  const wt = pick(WEALTH_TEXTS, rand);
+  const scores = [
+    { name:'正财运', val: score(rand,68,30) },
+    { name:'偏财运', val: score(rand,65,35) },
+    { name:'投资运', val: score(rand,62,38) },
+    { name:'财库稳定', val: score(rand,70,25) },
+    { name:'贵人财助', val: score(rand,72,25) },
+    { name:'守财能力', val: score(rand,68,28) },
+  ];
+  const lucky = ['优质房产','指数基金定投','实业经营','版权知识产权','股权投资','海外资产配置','农业大宗商品','艺术品收藏'];
+  const careful = ['高杠杆投机','民间高息借贷','无实质担保品种','虚拟货币短线','P2P类产品'];
+
+  const monthlyHtml = MONTHLY_WEALTH.map((m, i) => `
+    <div class="year-card">
+      <div class="year-num">${MONTH_NAMES[i]}</div>
+      <div class="year-gz" style="font-size:0.8rem">${m.icon}</div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:5px;line-height:1.5">${m.text}</div>
+    </div>
+  `).join('');
+
+  const wealthPeak = pick(['35-42岁','38-45岁','32-40岁','40-50岁'], rand);
+  const wealthMethod = pick(['积少成多式定期投资','以实业为根基的稳健增值','善用杠杆的进取型资产配置','以知识与人脉变现的轻资产模式'], rand);
+
+  return `
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◈</span> 财运总论</div>
+      <p>${wt.general}</p>
+      <p>${wt.strategy}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">☰</span> 财运六维深度评分</div>
+      ${scores.map(s=>`
+        <div class="score-row">
+          <span class="score-label">${s.name}</span>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:${s.val}%"></div></div>
+          <span class="score-val">${s.val}分</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◎</span> 财富积累方向与策略</div>
+      <div class="tip-grid">
+        <div class="tip-item">
+          <div class="tip-label">✦ 适合投资领域</div>
+          <div class="tip-value" style="color:#4caf50">${pick(lucky,rand)}、${pick(lucky,rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 谨慎回避</div>
+          <div class="tip-value" style="color:var(--red-light)">${pick(careful,rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 财运高峰年龄</div>
+          <div class="tip-value">${wealthPeak}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 最佳积富方式</div>
+          <div class="tip-value">${wealthMethod}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 近年旺财年份</div>
+          <div class="tip-value">${[2025,2026,2027,2028,2029].sort(()=>rand()-0.5).slice(0,2).sort().join('、')}年</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 每月财运佳日</div>
+          <div class="tip-value">${[3,6,9,12,15,18,21,24,27].sort(()=>rand()-0.5).slice(0,3).sort((a,b)=>a-b).join('、')}号</div>
+        </div>
+      </div>
+      <p style="margin-top:8px">${wt.warning}</p>
+      <p>${wt.peak}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬡</span> 全年十二月财运预测</div>
+      <div class="year-grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">${monthlyHtml}</div>
+    </div>
+  `;
+}
+
+function renderCareer(data, pillars, rand) {
+  const ct = pick(CAREER_TEXTS, rand);
+  const scores = [
+    { name:'事业总运', val: score(rand,70,28) },
+    { name:'职场人缘', val: score(rand,72,25) },
+    { name:'晋升机遇', val: score(rand,65,32) },
+    { name:'创业运势', val: score(rand,62,35) },
+    { name:'贵人助力', val: score(rand,74,22) },
+    { name:'领导能力', val: score(rand,70,28) },
+    { name:'专业技能', val: score(rand,73,24) },
+  ];
+  const careers = ['人工智能与大数据','金融投资与财富管理','医疗健康与生物科技','教育培训与在线学习','法律顾问与合规','文化传媒与内容创作','政府机关与公共事业','建筑地产与城市规划','跨境贸易与供应链','艺术设计与品牌策划','能源与新材料','心理咨询与社会工作'];
+
+  const workStyle = pick(['独立自主型，独当一面效率最高','团队协作型，在优秀团队中激发最大潜能','管理统筹型，擅长协调资源带领团队','专家顾问型，以专业知识为核心竞争力'], rand);
+  const leaderType = pick(['魅力型领导：以感召力与激情带动团队','专业型领导：以深厚专业知识赢得信任','战略型领导：善于制定大方向，高瞻远瞩','服务型领导：以成就团队为己任，深受下属爱戴'], rand);
+
+  const keyMonths = [...new Set([Math.floor(rand()*12)+1, Math.floor(rand()*12)+1, Math.floor(rand()*12)+1])].sort((a,b)=>a-b);
+
+  return `
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬟</span> 事业运势总论</div>
+      <p>${ct.general}</p>
+      <p>${ct.growth}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◈</span> 事业七维深度评分</div>
+      ${scores.map(s=>`
+        <div class="score-row">
+          <span class="score-label">${s.name}</span>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:${s.val}%"></div></div>
+          <span class="score-val">${s.val}分</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">☰</span> 适合行业与工作方式</div>
+      <div class="tip-grid">
+        <div class="tip-item">
+          <div class="tip-label">✦ 最佳行业方向</div>
+          <div class="tip-value">${pick(careers,rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 次选行业方向</div>
+          <div class="tip-value">${pick(careers,rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 工作方式偏好</div>
+          <div class="tip-value">${workStyle}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 领导风格类型</div>
+          <div class="tip-value">${leaderType}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 贵人属相</div>
+          <div class="tip-value">${pick(['龙、虎','马、兔','鼠、猴','牛、鸡'],rand)}年生人</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 事业腾飞时机</div>
+          <div class="tip-value">${pick(['35-40岁','30-35岁','40-45岁','28-33岁'],rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 最佳发展城市</div>
+          <div class="tip-value">${pick(['向东南沿海城市发展','向北方大城市深耕','向西南地区开拓','就地深耕，本地资源最旺'],rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 合伙人特征</div>
+          <div class="tip-value">${ct.partner.substring(0,20)}…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬡</span> 合伙与竞争关系解析</div>
+      <p>${ct.partner}</p>
+      <p>${ct.warning}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◉</span> 今年关键事业节点</div>
+      <p>命主今年职场运势整体${pick(['稳中向上，宜主动争取晋升机遇，勿等待观望','略有波折但大局稳健，保守为宜同时不可消极放弃','贵人频现，把握合作与合并机会，以小博大','创业时机成熟，可考虑独立发展，天时地利人和俱备'],rand)}。</p>
+      <p>今年最关键的三个月份为<strong style="color:var(--gold)">${keyMonths.join('月、')}月</strong>，此三月或有重大变化与转折：谈判、晋升、合同签订或新项目启动均宜选在此期间，把握住这三个节点，全年事业收获将超出预期。</p>
+    </div>
+  `;
+}
+
+function renderLove(data, pillars, rand) {
+  const lt = pick(LOVE_TEXTS[data.gender], rand);
+  const loveScores = [
+    { name:'感情总运', val: score(rand,70,28) },
+    { name:'桃花运势', val: score(rand,72,30) },
+    { name:'婚姻缘分', val: score(rand,68,28) },
+    { name:'伴侣质量', val: score(rand,74,22) },
+    { name:'感情稳定', val: score(rand,70,26) },
+    { name:'家庭和谐', val: score(rand,73,24) },
+  ];
+
+  const zodiacMatch = {
+    male: ['羊、兔、猪','龙、鼠、猴','虎、马、狗','牛、蛇、鸡'],
+    female: ['虎、马、狗','鼠、龙、猴','兔、羊、猪','牛、蛇、鸡'],
+  };
+
+  const loveAdvice = data.gender === 'male' ? [
+    '感情中切勿将工作压力带回家，学会在家门口放下疲惫，以饱满的能量陪伴伴侣，这是维系感情长久的关键。',
+    '适时展现浪漫与体贴，不要因为进入稳定期而忽视伴侣的情感需求，定期创造惊喜与仪式感，让爱情保鲜。',
+  ] : [
+    '学会接受并欣赏伴侣的不完美，减少对伴侣的改造欲望，信任与接纳是感情长久稳固的基石。',
+    '在感情中保持独立自主的一面，不要因爱情而迷失自我，保持个人成长与兴趣爱好，让自己成为更有魅力的伴侣。',
+  ];
+
+  const marriageDesc = [
+    '命主婚姻运势极佳，缘分深厚，婚后夫妻关系和谐，相互扶持，共同成长，是举案齐眉、白头偕老的命格。',
+    '命主婚姻以"先苦后甜"为主基调，婚姻初期需要磨合与适应，但感情越久越醇厚，晚年夫妻情感尤为深厚笃实。',
+    '命主婚姻运势稳健，伴侣对事业有助益，属于典型的"内助"型婚姻，夫妻共同打拼，财运事业双丰收。',
+  ];
+
+  return `
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">♡</span> 感情运势总论</div>
+      <p>${lt.general}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◈</span> 感情六维评分</div>
+      ${loveScores.map(s=>`
+        <div class="score-row">
+          <span class="score-label">${s.name}</span>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:${s.val}%"></div></div>
+          <span class="score-val">${s.val}分</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">☰</span> 命中伴侣特征解析</div>
+      <p>${lt.spouse}</p>
+      <div class="tip-grid" style="margin-top:14px">
+        <div class="tip-item">
+          <div class="tip-label">✦ 最佳配对属相</div>
+          <div class="tip-value">${pick(zodiacMatch[data.gender], rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 相合五行</div>
+          <div class="tip-value">${pick(['水、木相生','火、土相生','金、水相生','木、火相生'], rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 伴侣性格特点</div>
+          <div class="tip-value">${pick(['温柔体贴、善解人意','聪慧独立、志向远大','稳重踏实、责任心强','活泼开朗、充满活力'], rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 可能相遇场合</div>
+          <div class="tip-value">${pick(['工作职场','朋友介绍','兴趣社群','旅行途中','网络结缘'], rand)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◎</span> 姻缘时机与婚姻运势</div>
+      <p>${lt.timing}</p>
+      <p>${pick(marriageDesc, rand)}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬡</span> 感情经营建议</div>
+      <p>${lt.advice}</p>
+      ${loveAdvice.map(a=>`<p>${a}</p>`).join('')}
+    </div>
+  `;
+}
+
+function renderHealth(data, pillars, elemCnt, rand) {
+  const dominant = Object.entries(elemCnt).sort((a,b)=>b[1]-a[1])[0][0];
+  const ht = HEALTH_TEXTS[dominant];
+
+  const healthScores = [
+    { name:'整体健康', val: score(rand,72,22) },
+    { name:'心脏循环', val: score(rand,70,24) },
+    { name:'消化系统', val: score(rand,68,26) },
+    { name:'呼吸系统', val: score(rand,72,22) },
+    { name:'肌骨关节', val: score(rand,74,20) },
+    { name:'心理健康', val: score(rand,70,24) },
+    { name:'免疫力', val: score(rand,73,22) },
+  ];
+
+  const lifespan = score(rand, 78, 16);
+  const exerciseTypes = ['游泳（全身有氧）','太极拳（调和气血）','瑜伽（身心合一）','慢跑（提升心肺）','八段锦（强身固本）','骑行（低强度持续）'];
+
+  const mentalHealthDesc = [
+    '命主情绪管理能力良好，心态平和稳定，具有较强的抗压能力，面对逆境能保持理性与积极，是良好心理素质的体现。建议培养冥想或书写日记的习惯，进一步提升内心的宁静感。',
+    '命主思维活跃，情感丰富，偶有焦虑或多虑的倾向，建议培养"活在当下"的正念思维，减少对未来的过度担忧，多与信任的朋友或家人倾诉，释放积压情绪。',
+    '命主性格偏于内敛，有时会将压力藏在心底，长期积累易引发情绪低落。建议主动拓展社交圈，参加兴趣小组或运动团体，在人际交流中汲取正能量，平衡内外世界。',
+  ];
+
+  return `
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">✦</span> 健康运势总论</div>
+      <p>${ht.organ}</p>
+      <p>${ht.risk}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◈</span> 健康七维评分</div>
+      ${healthScores.map(s=>`
+        <div class="score-row">
+          <span class="score-label">${s.name}</span>
+          <div class="score-bar-wrap"><div class="score-bar" style="width:${s.val}%"></div></div>
+          <span class="score-val">${s.val}分</span>
+        </div>`).join('')}
+      <p style="margin-top:14px;color:var(--text-dim);font-size:0.85rem">命主寿元预测：<strong style="color:var(--gold)">${lifespan}岁以上</strong>，养生得法则更可期颐之寿。</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">☰</span> 季节性健康注意事项</div>
+      <p>${ht.season}</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬡</span> 养生方案与日常建议</div>
+      <p>${ht.advice}</p>
+      <div class="tip-grid">
+        <div class="tip-item">
+          <div class="tip-label">✦ 推荐运动方式</div>
+          <div class="tip-value">${pick(exerciseTypes,rand)}、${pick(exerciseTypes,rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 开运养生食材</div>
+          <div class="tip-value">${ht.lucky_food}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 最佳入睡时间</div>
+          <div class="tip-value">${pick(['22:30前','23:00前','22:00前'], rand)}</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-label">✦ 每年重点体检项</div>
+          <div class="tip-value">${pick(['肝胆 + 肠胃镜','心脏 + 血压血糖','肺部 CT + 肾功能','全套血液 + 脊柱'], rand)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◎</span> 心理健康分析</div>
+      <p>${pick(mentalHealthDesc, rand)}</p>
+    </div>
+  `;
+}
+
+function renderYearly(data, pillars, rand) {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let y = currentYear - 1; y <= currentYear + 9; y++) {
+    const yp = getYearPillar(y);
+    const starCount = Math.floor(rand() * 3) + 3;
+    years.push({ year: y, gz: yp.stem + yp.branch, stars: starCount, current: y === currentYear, yp });
+  }
+
+  const yearDescMap = {
+    5: '大吉之年，诸事顺遂，全力进取，成就斐然',
+    4: '运势颇旺，贵人相助，稳步推进，把握机遇',
+    3: '平稳之年，积累实力，量力而行，静待时机',
+  };
+
+  const thisYear = years.find(y => y.current);
+  const nextYear = years.find(y => y.year === currentYear + 1);
+
+  const monthlyYearFortune = MONTH_NAMES.map((m, i) => {
+    const s = Math.floor(rand() * 3) + 3;
+    return `<div class="year-card">
+      <div class="year-num">${m}</div>
+      <div class="year-gz" style="font-size:0.85rem">${stars(s)}</div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px;line-height:1.4">${pick(['财运旺，宜进取','事业有机遇','平稳守成','贵人现身','谨慎为宜','家庭和谐','感情顺遂','健康注意','出行吉利','学习充电','人脉拓展','年末收官'], rand)}</div>
+    </div>`;
+  }).join('');
+
+  const keyEvents = [
+    `${currentYear}年上半年（1-6月）：${pick(['事业迎来重要转折，谈判签约大吉，把握合作机遇','财运上升明显，投资布局宜在此阶段','感情运旺盛，单身者有望觅得良缘，已婚者感情升温','贵人频现，人脉拓展效果显著，宜广结善缘'], rand)}。`,
+    `${currentYear}年下半年（7-12月）：${pick(['事业冲刺期，工作业绩亮眼，晋升机会近在眼前','偏财运旺盛，额外收益有望，关注投资市场机遇','家庭生活质量提升，家人关系趋于和谐融洽','总结全年得失，为来年布局，调整策略方向'], rand)}。`,
+  ];
+
+  return `
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◉</span> 近十年年运走势</div>
+      <div class="year-grid">
+        ${years.map(y=>`
+          <div class="year-card" style="${y.current?'border-color:var(--gold);background:var(--bg3)':''}">
+            <div class="year-num">${y.year}年${y.current?'<span style="color:var(--gold)"> ◆今</span>':''}</div>
+            <div class="year-gz">${y.gz}年</div>
+            <div class="year-stars">${stars(y.stars)}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">☰</span> ${currentYear}年（${thisYear.gz}年）全年详解</div>
+      <p>${currentYear}年为<strong style="color:var(--gold)">${thisYear.gz}年</strong>，整体运势：${yearDescMap[thisYear.stars] || '平稳之年，量力而行'}。命主今年流年五行与本命相${pick(['相合，吉气叠加，万事皆宜主动出击','相生，如沐春风，运势徐徐上升','中性，宜稳扎稳打积累为主','局部冲克，需把握好节奏不可冒进'], rand)}，全年基调${pick(['积极向好，上升趋势明显','稳中有进，守中有为','略有挑战，考验智慧与韧劲','大起大落，把握机遇化险为夷'], rand)}。</p>
+      ${keyEvents.map(e=>`<p>${e}</p>`).join('')}
+      <p>今年需特别关注的月份：<strong style="color:var(--gold)">${[...new Set([Math.floor(rand()*12)+1, Math.floor(rand()*12)+1, Math.floor(rand()*12)+1])].sort((a,b)=>a-b).join('月、')}月</strong>，此期间或有重大变化，宜提前谋划，灵活应对，切勿措手不及。</p>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">◈</span> ${currentYear}年十二月运势预测</div>
+      <div class="year-grid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">${monthlyYearFortune}</div>
+    </div>
+
+    <div class="analysis-card">
+      <div class="analysis-card-title"><span class="icon">⬡</span> ${currentYear+1}年（${nextYear.gz}年）前瞻</div>
+      <p>${currentYear+1}年流年<strong style="color:var(--gold)">${nextYear.gz}</strong>，整体运势：${yearDescMap[nextYear.stars] || yearDescMap[3]}。命主宜在今年做好以下三点布局：其一，${pick(['巩固现有事业基础，拓展合作关系','加大投资布局，锁定潜力标的','提升个人技能，考取重要资格证书','修缮家庭关系，打好家庭感情基础'], rand)}；其二，${pick(['开始筛选创业合伙人，组建核心团队','调整资产结构，向稳健方向倾斜','扩大社交圈，结识有资源的贵人','关注健康，做全面体检以防患于未然'], rand)}；其三，${pick(['保持积极心态，对未来充满信心','做好应急预案，防范不确定性风险','规划明年重大决定，不打无准备之仗','储蓄充足流动资金，为明年的机遇提供弹药'], rand)}。如此则${currentYear+1}年必然收获超预期，人生进入崭新篇章。</p>
+    </div>
+  `;
+}
+
+// ============================================================
+//  主计算逻辑
+// ============================================================
+function calculate() {
+  const name = document.getElementById('name').value.trim() || '匿名命主';
+  const gender = document.getElementById('gender').value;
+  const dateStr = document.getElementById('birthDate').value;
+  const hour = parseInt(document.getElementById('birthHour').value);
+  const place = document.getElementById('birthPlace').value.trim();
+
+  if (!dateStr) { alert('请选择出生日期'); return; }
+
+  const [year, month, day] = dateStr.split('-').map(Number);
+
+  // 计算八字
+  const yp = getYearPillar(year);
+  const mp = getMonthPillar(year, month);
+  const dp = getDayPillar(year, month, day);
+  const hp = getHourPillar(dp.si, hour);
+  const pillars = [yp, mp, dp, hp];
+
+  const zodiacIdx = ((year - 4) % 12 + 12) % 12;
+  const zodiac = ZODIAC[zodiacIdx];
+
+  const elemCnt = countElements(pillars);
+
+  const data = { name, gender, year, month, day, hour, place, zodiac };
+
+  // 基于生日的seed
+  const seed = year * 10000 + month * 100 + day + hour * 7 + (gender === 'male' ? 0 : 13);
+  const rand = seededRand(seed);
+
+  document.getElementById('inputCard').style.display = 'none';
+  document.getElementById('loading').classList.add('show');
+
+  setTimeout(() => {
+    document.getElementById('loading').classList.remove('show');
+
+    // 渲染表头
+    document.getElementById('resultHeader').innerHTML = `
+      <div class="result-name">${name}</div>
+      <div class="result-meta">
+        ${year}年${month}月${day}日 · ${BRANCHES[HOUR_BRANCH[hour]]}时 · ${zodiac}年 · ${gender === 'male' ? '男命' : '女命'}
+        ${place ? ' · ' + place : ''}
+      </div>
+      <div class="bazi-display">
+        ${pillars.map((p, i) => `
+          <div class="pillar">
+            <div class="pillar-label">${['年','月','日','时'][i]}柱</div>
+            <div class="pillar-stem ${ELEM_COLOR[STEM_ELEM[p.si]]}">${p.stem}</div>
+            <div class="pillar-branch ${ELEM_COLOR[BRANCH_ELEM[p.bi]]}">${p.branch}</div>
+          </div>`).join('')}
+      </div>
+    `;
+
+    // 渲染各模块
+    const r1 = seededRand(seed + 1), r2 = seededRand(seed + 2),
+          r3 = seededRand(seed + 3), r4 = seededRand(seed + 4),
+          r5 = seededRand(seed + 5), r6 = seededRand(seed + 6),
+          r7 = seededRand(seed + 7), r8 = seededRand(seed + 8);
+
+    document.getElementById('tab-bazi').innerHTML = renderBazi(data, pillars, elemCnt, r1);
+    document.getElementById('tab-face').innerHTML = renderFace(data, pillars, r2);
+    document.getElementById('tab-fengshui').innerHTML = renderFengshui(data, pillars, elemCnt, r3);
+    document.getElementById('tab-wealth').innerHTML = renderWealth(data, pillars, r4);
+    document.getElementById('tab-career').innerHTML = renderCareer(data, pillars, r5);
+    document.getElementById('tab-love').innerHTML = renderLove(data, pillars, r6);
+    document.getElementById('tab-health').innerHTML = renderHealth(data, pillars, elemCnt, r7);
+    document.getElementById('tab-yearly').innerHTML = renderYearly(data, pillars, r8);
+
+    document.getElementById('results').classList.add('show');
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+  }, 2200);
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function reset() {
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('inputCard').style.display = '';
+  document.querySelector('.input-card').scrollIntoView({ behavior: 'smooth' });
+  // reset tabs
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-bazi').classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach((b, i) => { b.classList.toggle('active', i === 0); });
+}
+
+// ============================================================
+//  星空动画
+// ============================================================
+(function initStars() {
+  const canvas = document.getElementById('starCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function createStars() {
+    stars = [];
+    for (let i = 0; i < 200; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.2 + 0.3,
+        a: Math.random(),
+        da: (Math.random() - 0.5) * 0.005,
+        speed: Math.random() * 0.15 + 0.05,
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    stars.forEach(s => {
+      s.a += s.da;
+      if (s.a <= 0 || s.a >= 1) s.da *= -1;
+      s.y += s.speed;
+      if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,168,76,${s.a * 0.7})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); createStars(); });
+  resize(); createStars(); draw();
+})();
+</script>
+</body>
+</html>
