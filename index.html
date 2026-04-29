@@ -640,7 +640,9 @@ const ZODIAC = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗
 const STEM_ELEM = ['木','木','火','火','土','土','金','金','水','水'];
 const BRANCH_ELEM = ['水','土','木','木','土','火','火','土','金','金','土','水'];
 const ELEM_COLOR = { '火':'element-fire','木':'element-wood','水':'element-water','金':'element-metal','土':'element-earth' };
-const HOUR_BRANCH = [11,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11];
+// 时支对照表（索引=实际时钟小时 0-23，值=地支序号）
+// 子时=23:00-01:00，丑时=01:00-03:00，以此类推
+const HOUR_BRANCH = [0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,0];
 const MONTH_NAMES = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
 
 // ============================================================
@@ -1888,6 +1890,14 @@ function renderFengshui(data, pillars, elemCnt, rand) {
 function buildShared(seed, pillars) {
   const rand = seededRand(seed + 997);
 
+  // 命主命局主导五行（财运/事业/贵人属相等共用同一判断）
+  const elemCnt = { '木':0,'火':0,'土':0,'金':0,'水':0 };
+  pillars.forEach(p => { elemCnt[STEM_ELEM[p.si]]++; elemCnt[BRANCH_ELEM[p.bi]]++; });
+  const domElem = Object.entries(elemCnt).sort((a,b) => b[1]-a[1])[0][0];
+  const wGuiren = WEALTH_GUIREN[domElem];
+  // 贵人属相文字（财运/事业模块统一）
+  const benefactorZodiac = wGuiren.shuxiang.map(s => s.split('（')[0].replace('属','')).join('、');
+
   // 十二月财运星级（财运模块与年运模块共用同一组数据）
   const wealthMonthStars = Array.from({length: 12}, () => Math.floor(rand() * 3) + 3);
 
@@ -1915,7 +1925,7 @@ function buildShared(seed, pillars) {
     yearStars[y] = Math.floor(rand() * 3) + 3;
   }
 
-  return { wealthMonthStars, bestWealthMonths, careerMonthStars, bestCareerMonths, yearStars };
+  return { domElem, wGuiren, benefactorZodiac, wealthMonthStars, bestWealthMonths, careerMonthStars, bestCareerMonths, yearStars };
 }
 
 function renderWealth(data, pillars, rand, shared) {
@@ -1928,18 +1938,12 @@ function renderWealth(data, pillars, rand, shared) {
     }, {})
   }).sort((a,b)=>b[1]-a[1])[0]?.[0] || pick(['木','火','土','金','水'], rand);
 
-  // 用五行最强的元素决定方位/摆件/饰品/贵人
-  const elemCntLocal = { '木':0,'火':0,'土':0,'金':0,'水':0 };
-  pillars.forEach(p => {
-    elemCntLocal[STEM_ELEM[p.si]]++;
-    elemCntLocal[BRANCH_ELEM[p.bi]]++;
-  });
-  const domElem = Object.entries(elemCntLocal).sort((a,b)=>b[1]-a[1])[0][0];
-
+  // 直接使用 shared 中已计算的主导五行和贵人数据，避免重复计算
+  const domElem = shared.domElem;
   const wDir = WEALTH_DIRECTION[domElem];
   const wItems = WEALTH_ITEMS[domElem];
   const wJewelry = WEALTH_JEWELRY[domElem];
-  const wGuiren = WEALTH_GUIREN[domElem];
+  const wGuiren = shared.wGuiren;
 
   const scores = [
     { name:'正财运', val: score(rand,68,30) },
@@ -2168,7 +2172,7 @@ function renderCareer(data, pillars, rand, shared) {
         </div>
         <div class="tip-item">
           <div class="tip-label">✦ 贵人属相</div>
-          <div class="tip-value">${pick(['龙、虎','马、兔','鼠、猴','牛、鸡'],rand)}年生人</div>
+          <div class="tip-value">${shared.benefactorZodiac}年生人</div>
         </div>
         <div class="tip-item">
           <div class="tip-label">✦ 事业腾飞时机</div>
